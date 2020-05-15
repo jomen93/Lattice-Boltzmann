@@ -1,17 +1,18 @@
 from LB import LatticeBoltzmann
 import numpy as np 
+from utils import plot_3d
+Nx = 4
+Ny = 4
 
-wo = 1/3.
-c = 0.5
-tau = 0.5
-Lx = 128
-Ly = 128
+x = LatticeBoltzmann(Nx,Ny)
 
 
-x = LatticeBoltzmann(c,tau,Lx,Ly,True)
-j = np.zeros(2)
-rho = 1
+x.Init()
+x.Macroscopic()
+#plot_3d(x.rho,"rho")
+x.Collision()
+print(x.f_post)
 
-print(x.Initialize(rho,j))
-print(x.rho())
-print(x.J())
+#x.Macroscopic()
+#print(x.Colision())
+
