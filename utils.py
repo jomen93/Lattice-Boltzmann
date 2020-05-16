@@ -1,5 +1,8 @@
+import matplotlib
+matplotlib.use("TKAgg")
 import matplotlib.pyplot as plt
 from  mpl_toolkits.mplot3d import Axes3D
+import matplotlib.animation as animation
 import numpy as np
 
 def plot_3d(data,name):
@@ -33,5 +36,23 @@ def plot_3d(data,name):
 	plt.tight_layout()
 	plt.show()
 
+def Animation(cube):
+	fig = plt.figure()
+	#Writer = animation.writers['ffmpeg']
+	#writer = Writer(fps=15, metadata=dict(artist='Me'), bitrate=1800)
+
+	mappable = plt.cm.ScalarMappable(cmap = plt.cm.jet)
+	mappable.set_array(cube[-1])
+	mappable.set_clim(-1,1)
+	ims = []
+	for i in range(len(cube)):
+		im = plt.imshow(cube[i],cmap=mappable.cmap, 
+			interpolation = "sinc",animated=True)
+		ims.append([im])
+	ani = animation.ArtistAnimation(fig,ims, interval = 50,blit=True,repeat_delay=1000)
+	plt.colorbar(mappable)
+	plt.tight_layout()
+	#ani.save('im.mp4', writer=writer)
+	plt.show()
 
 

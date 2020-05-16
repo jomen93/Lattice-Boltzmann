@@ -55,7 +55,7 @@ class LatticeBoltzmann(object):
 				self.feq[i,:,:] = 3*self.w[i]*(self.c2*self.rho +self.v[i][0]*self.J[0]+self.v[i][1]*self.J[1])
 			return self.feq
 
-	def Feq_fluid(self):
+	def Feq_fluids(self):
 		cu = 3.0*np.dot(self.v,self.J.transpose(1,0,2))
 		usqr = 3/2.*(self.J[0]**2+self.J[1]**2)
 		for i in range(self.Q):
@@ -63,14 +63,11 @@ class LatticeBoltzmann(object):
 		return self.feq
 
 	def Init(self):
-		x = np.linspace(0, 5, self.Nx)
-		y = np.linspace(0, 5, self.Ny)
-		x, y = np.meshgrid(x, y)
 		x_length = int(self.Nx/64); y_length = int(self.Nx/64)
 		x_c = int(self.Nx/4); y_c = int(self.Nx/2)
 		x_c1 = int(3*self.Nx/4); y_c1 = int(self.Nx/2)
-		self.rho[x_c-x_length:x_c+x_length,y_c-y_length:y_c+y_length] = 1.1
-		self.rho[x_c1-x_length:x_c1+x_length,y_c1-y_length:y_c1+y_length] = 1.1
+		self.rho[x_c-x_length:x_c+x_length,y_c-y_length:y_c+y_length] = 1.01
+		#self.rho[x_c1-x_length:x_c1+x_length,y_c1-y_length:y_c1+y_length] = 1.1
 		self.f = self.Feq()	
 
 	# Calculate macroscopic variables
@@ -120,6 +117,15 @@ class LatticeBoltzmann(object):
 		self.f[6,0,0] = self.f[6,1,1]
 		self.f[8,0,0] = self.f[8,1,1]
 		self.f[0,0,0] = self.f[0,1,1]
+
+	def pulse(self,M):
+		x_length = int(self.Nx/64); y_length = int(self.Nx/64)
+		x_c = int(self.Nx/4); y_c = int(self.Nx/2)
+		x_c1 = int(3*self.Nx/4); y_c1 = int(self.Nx/2)
+		M[x_c-x_length:x_c+x_length,y_c-y_length:y_c+y_length] = 1.1
+		return M
+		
+
 		
 	
 
