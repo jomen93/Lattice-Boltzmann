@@ -3,19 +3,34 @@ from  mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 
 def plot_3d(data,name):
-	fig = plt.figure()
-	#ax = plt.axes(projection="3d")
-	ax = fig.gca(projection='3d')
 
-	x = np.linspace(-5, 5, np.shape(data)[0])
-	y = np.linspace(-5, 5, np.shape(data)[1])
-	x, y = np.meshgrid(x, y)
-	surf = ax.plot_surface(x,y,data,rstride=1,cstride=1,cmap= "YlGn",edgecolor='none',linewidth = 0.2)
-	ax.set_xlabel("x")
-	ax.set_ylabel("y")
-	ax.set_zlabel(name)
-	cbar = fig.colorbar(surf, shrink=0.5, aspect=8)
-	cbar.set_label(name)
+	X = np.linspace(0, 5, np.shape(data)[0])
+	Y = np.linspace(0, 5, np.shape(data)[1])
+	x, y = np.meshgrid(X, Y)
+
+	
+	mappable = plt.cm.ScalarMappable(cmap = plt.cm.viridis)
+	mappable.set_array(data)
+	mappable.set_clim(-1,1)
+
+	fig = plt.figure(figsize = (10,4))
+	
+	ax1 = fig.add_subplot(121,projection="3d")
+	ax1.plot_surface(x,y,data,cmap=mappable.cmap, norm = mappable.norm, linewidth=0,antialiased=False)
+	ax1.set_xlabel("x")
+	ax1.set_ylabel("y")
+	ax1.set_zlabel(name)
+	ax1.set_xlim(np.min(X),np.max(X)) 
+	ax1.set_ylim(np.min(Y),np.max(Y)) 
+	ax1.set_zlim(-1,1) 
+	
+	
+	ax2 = fig.add_subplot(122)
+	ax2.imshow(data,cmap=mappable.cmap, norm=mappable.norm,
+		extent=(np.min(x),np.max(x),np.min(y),np.max(y)),interpolation = "none")
+
+	plt.colorbar(mappable)
+	plt.tight_layout()
 	plt.show()
 
 
