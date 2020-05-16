@@ -11,7 +11,7 @@ class LatticeBoltzmann(object):
 		self.tau = 0.5 
 		self.W = self.dt/self.tau; 
 		self.Wp = 1-self.W
-		self.c2 = 2/5.
+		self.c2 = 3/5.
 
 
 		# Parameteres od lattice D2Q9
@@ -20,10 +20,23 @@ class LatticeBoltzmann(object):
 		self.w = np.array([4.0/9 ,1.0/9 ,1.0/9 ,1.0/9 ,1.0/36 ,1.0/36 ,1.0/9,1.0/36,1.0/36.]) 
 
 		self.left = np.arange(self.Q)[np.asarray([ci[0]<0  for ci in self.v])] 
-		self.center = np.arange(self.Q)[np.asarray([ci[0]==0  for ci in self.v])] 
 		self.right = np.arange(self.Q)[np.asarray([ci[0]>0  for ci in self.v])] 
+		
+		self.center = np.arange(self.Q)[np.asarray([ci[0]==0  for ci in self.v])] 
+		
 		self.upper = np.arange(self.Q)[np.asarray([ci[1]>0  for ci in self.v])] 
-		self.lower = np.arange(self.Q)[np.asarray([ci[1]<0  for ci in self.v])] 
+		self.lower = np.arange(self.Q)[np.asarray([ci[1]<0  for ci in self.v])]
+
+		#fluid Parameters
+		# Reynolds number
+		self.Re = 220.0
+		# characteristic length 
+		L = (self.Nx*self.Ny)
+		# Velocity in lattice units
+		uLB = 0.04; nulb = uLB*L/self.Re
+		# Relaxation parameters 
+		self.omega = 1.0/(3.*(uLB*L/self.Re)+0.5)
+
 		
 		# initialization macroscopic variables
 		self.rho = np.ones((Nx,Ny))
@@ -42,11 +55,20 @@ class LatticeBoltzmann(object):
 				self.feq[i,:,:] = 3*self.w[i]*(self.c2*self.rho +self.v[i][0]*self.J[0]+self.v[i][1]*self.J[1])
 			return self.feq
 
+	def Feq_fluid(self):
+		cu = 3.0*np.dot(self.v,self.J.transpose(1,0,2))
+		usqr = 3/2.*(self.J[0]**2+self.J[1]**2)
+		for i in range(self.Q):
+			self.f[i,:,:] = self.rho*self.w[i]*(1.+cu[i]+0.5*cu[i]**2-usqr)
+		return self.feq
+
 	def Init(self):
 		x = np.linspace(0, 5, self.Nx)
 		y = np.linspace(0, 5, self.Ny)
 		x, y = np.meshgrid(x, y)
-		self.rho = np.exp(-10*((x-5/2)**2+(y-5/2)**2))
+		x_length = int(self.Nx/32); y_length = int(self.Nx/32)
+		x_c = int(self.Nx/2); y_c = int(self.Nx/2)
+		self.rho[x_c-x_length:x_c+x_length,y_c-y_length:y_c+y_length] = 1.1
 		self.f = self.Feq()	
 
 	# Calculate macroscopic variables
@@ -55,29 +77,47 @@ class LatticeBoltzmann(object):
 		self.J = np.dot(self.v.transpose(),self.f.transpose((1,0,2)))/self.rho
 		
 	def Collision(self):
-		self.f_post = self.Wp*self.f + self.W*self.Feq()
+		self.f_post = self.f - self.omega*(self.f-self.Feq())
+		#self.f_post = self.Wp*self.f + self.W*self.Feq()
 
 	def Streaming(self):
 		for i in range(self.Q):
-			self.f[1,:,:] = np.roll(np.roll(self.f_post[i,:,:],self.v[i,0],axis = 0),self.v[i,1],axis=1)
+			self.f[i,:,:] = np.roll(np.roll(self.f_post[i,:,:],self.v[i,0],axis = 0),self.v[i,1],axis=1)
 
 	def Boundaries(self):
-		pass
-		#self.f[self.right,1:-1,1] = self.f_post[self.right,1:-1,-1] 
-		#self.f[self.left,:,-1] = self.f[self.right,:,1] 
-		#self.f[self.left,:,-1] = self.f[self.left,:,0]
-		
-		#self.f[self.upper,-1,:] = self.f[self.upper,0,:]
-		#self.f[self.left,:,-1] = self.f[self.left,:,0]
+		"""
+		Free boundary condition
+		"""
+		# right wall
+		self.f[self.left,-1,:] = self.f[self.left,-2,:]
+		# left wall
+		self.f[self.right,0,:] = self.f[self.right,1,:]
+		# Upper wall
+		self.f[self.lower,:,-1] = self.f[self.lower,:,-2]
+		# Lower wall
+		self.f[self.upper,:,0] = self.f[self.upper,:,1]
 
-		#self.f[self.right,0,:] = self.f[self.right,1,:]
-		#self.f[self.upper,:,-1] = self.f[self.upper,:,-2]
-		# self.f[self.upper,:,0] = self.f[self.upper,:,1]
-		
-		
-
-
-
+		# corners 
+		# right uppper
+		self.f[1,-1,-1] = self.f[1,-2,-2] 
+		self.f[3,-1,-1] = self.f[3,-2,-2] 
+		self.f[4,-1,-1] = self.f[4,-2,-2]
+		self.f[0,-1,-1] = self.f[0,-2,-2]
+		# left upper
+		self.f[6,0,-1] = self.f[6,1,-2]
+		self.f[1,0,-1] = self.f[1,1,-2]
+		self.f[7,0,-1] = self.f[7,1,-2]
+		self.f[0,0,-1] = self.f[0,1,-2]
+		# right lower
+		self.f[2,-1,0] = self.f[2,-1,1]
+		self.f[3,-1,0] = self.f[3,-1,1]
+		self.f[5,-1,0] = self.f[5,-1,1]
+		self.f[0,-1,0] = self.f[0,-1,1]
+		# left lower
+		self.f[2,0,0] = self.f[2,1,1]
+		self.f[6,0,0] = self.f[6,1,1]
+		self.f[8,0,0] = self.f[8,1,1]
+		self.f[0,0,0] = self.f[0,1,1]
 		
 	
 

@@ -11,7 +11,7 @@ def plot_3d(data,name):
 	
 	mappable = plt.cm.ScalarMappable(cmap = plt.cm.viridis)
 	mappable.set_array(data)
-	mappable.set_clim(-1,1)
+	#mappable.set_clim(0.5,1.1)
 
 	fig = plt.figure(figsize = (10,4))
 	
@@ -22,7 +22,7 @@ def plot_3d(data,name):
 	ax1.set_zlabel(name)
 	ax1.set_xlim(np.min(X),np.max(X)) 
 	ax1.set_ylim(np.min(Y),np.max(Y)) 
-	ax1.set_zlim(-1,1) 
+	#ax1.set_zlim(0.5,1.1) 
 	
 	
 	ax2 = fig.add_subplot(122)
