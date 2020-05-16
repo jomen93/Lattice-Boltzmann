@@ -66,9 +66,11 @@ class LatticeBoltzmann(object):
 		x = np.linspace(0, 5, self.Nx)
 		y = np.linspace(0, 5, self.Ny)
 		x, y = np.meshgrid(x, y)
-		x_length = int(self.Nx/32); y_length = int(self.Nx/32)
-		x_c = int(self.Nx/2); y_c = int(self.Nx/2)
+		x_length = int(self.Nx/64); y_length = int(self.Nx/64)
+		x_c = int(self.Nx/4); y_c = int(self.Nx/2)
+		x_c1 = int(3*self.Nx/4); y_c1 = int(self.Nx/2)
 		self.rho[x_c-x_length:x_c+x_length,y_c-y_length:y_c+y_length] = 1.1
+		self.rho[x_c1-x_length:x_c1+x_length,y_c1-y_length:y_c1+y_length] = 1.1
 		self.f = self.Feq()	
 
 	# Calculate macroscopic variables
