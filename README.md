@@ -1,2 +1,2 @@
-# waves-Lattice-Boltzmann
+# Lattice-Boltzmann
  
