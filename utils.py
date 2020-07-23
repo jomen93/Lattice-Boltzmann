@@ -36,23 +36,30 @@ def plot_3d(data,name):
 	plt.tight_layout()
 	plt.show()
 
-def Animation(cube):
+def Animation(cube,name):
 	fig = plt.figure()
 	#Writer = animation.writers['ffmpeg']
 	#writer = Writer(fps=15, metadata=dict(artist='Me'), bitrate=1800)
-
-	mappable = plt.cm.ScalarMappable(cmap = plt.cm.jet)
+	x = np.arange(np.shape(cube)[0])
+	y = np.arange(np.shape(cube)[0])
+	
+	mappable = plt.cm.ScalarMappable(cmap = plt.cm.viridis)
 	mappable.set_array(cube[-1])
-	mappable.set_clim(-1,1)
+	mappable.set_clim(0,1)
 	ims = []
 	for i in range(len(cube)):
 		im = plt.imshow(cube[i],cmap=mappable.cmap, 
 			interpolation = "sinc",animated=True)
 		ims.append([im])
+		#plt.savefig("imagen_"+str(i))
 	ani = animation.ArtistAnimation(fig,ims, interval = 50,blit=True,repeat_delay=1000)
+	#plt.streamplot()
 	plt.colorbar(mappable)
 	plt.tight_layout()
-	#ani.save('im.mp4', writer=writer)
+	plt.xlabel("$x$")
+	plt.ylabel("$y$")
+	plt.title("2D field solution")
+	ani.save(name+".gif",dpi=80,writer="imagemagick")
 	plt.show()
 
 

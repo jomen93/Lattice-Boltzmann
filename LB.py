@@ -1,6 +1,7 @@
 
 import numpy as np 
 
+
 class LatticeBoltzmann(object):
 	"""docstring for LatticeBoltzmann"""
 	def __init__(self,Nx,Ny):
@@ -48,7 +49,7 @@ class LatticeBoltzmann(object):
 		self.f = np.zeros((self.Q,Nx,Ny))
 		# Initialization auxiliar varible to streaming process
 		self.f_post = np.zeros((self.Q,Nx,Ny))
-		
+	
 	def Feq(self):
 			self.feq[0] = self.rho*(1-3*self.c2*(1-self.w[0]))
 			for i in range(1,self.Q):
@@ -63,11 +64,11 @@ class LatticeBoltzmann(object):
 		return self.feq
 
 	def Init(self):
-		x_length = int(self.Nx/64); y_length = int(self.Nx/64)
-		x_c = int(self.Nx/4); y_c = int(self.Nx/2)
-		x_c1 = int(3*self.Nx/4); y_c1 = int(self.Nx/2)
-		self.rho[x_c-x_length:x_c+x_length,y_c-y_length:y_c+y_length] = 1.01
-		#self.rho[x_c1-x_length:x_c1+x_length,y_c1-y_length:y_c1+y_length] = 1.1
+		x_length = int(self.Nx/256); y_length = int(self.Nx/256)
+		x_c = int(2*self.Nx/6); y_c = int(self.Nx/2)
+		x_c1 = int(4*self.Nx/6); y_c1 = int(self.Nx/2)
+		self.rho[x_c-x_length:x_c+x_length,y_c-y_length:y_c+y_length] = 1.001
+		self.rho[x_c1-x_length:x_c1+x_length,y_c1-y_length:y_c1+y_length] = 1.001
 		self.f = self.Feq()	
 
 	# Calculate macroscopic variables
@@ -82,6 +83,18 @@ class LatticeBoltzmann(object):
 	def Streaming(self):
 		for i in range(self.Q):
 			self.f[i,:,:] = np.roll(np.roll(self.f_post[i,:,:],self.v[i,0],axis = 0),self.v[i,1],axis=1)
+
+
+	#### implementation Boundary conditions in Fluids ###
+	"""
+	We focused on analitycal and standard numerical procedures for boundary conditions 
+	in fluid flow problems. 
+	"""
+
+	#Bounce Back boundary condition 
+
+
+
 
 	def Boundaries(self):
 		"""
@@ -118,12 +131,6 @@ class LatticeBoltzmann(object):
 		self.f[8,0,0] = self.f[8,1,1]
 		self.f[0,0,0] = self.f[0,1,1]
 
-	def pulse(self,M):
-		x_length = int(self.Nx/64); y_length = int(self.Nx/64)
-		x_c = int(self.Nx/4); y_c = int(self.Nx/2)
-		x_c1 = int(3*self.Nx/4); y_c1 = int(self.Nx/2)
-		M[x_c-x_length:x_c+x_length,y_c-y_length:y_c+y_length] = 1.1
-		return M
 		
 
 		
