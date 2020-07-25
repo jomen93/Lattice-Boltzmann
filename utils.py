@@ -5,14 +5,14 @@ from  mpl_toolkits.mplot3d import Axes3D
 import matplotlib.animation as animation
 import numpy as np
 
-def plot_3d(data,name):
+def plot_3d(data,name,color):
 
 	X = np.linspace(0, 5, np.shape(data)[0])
 	Y = np.linspace(0, 5, np.shape(data)[1])
 	x, y = np.meshgrid(X, Y)
 
 	
-	mappable = plt.cm.ScalarMappable(cmap = plt.cm.viridis)
+	mappable = plt.cm.ScalarMappable(cmap = color)
 	mappable.set_array(data)
 	#mappable.set_clim(0.5,1.1)
 
@@ -36,7 +36,7 @@ def plot_3d(data,name):
 	plt.tight_layout()
 	plt.show()
 
-def Animation(cube,name):
+def Animation(cube,name,color):
 	fig = plt.figure()
 	#Writer = animation.writers['ffmpeg']
 	#writer = Writer(fps=15, metadata=dict(artist='Me'), bitrate=1800)
@@ -45,11 +45,11 @@ def Animation(cube,name):
 	
 	mappable = plt.cm.ScalarMappable(cmap = plt.cm.viridis)
 	mappable.set_array(cube[-1])
-	mappable.set_clim(0,1)
+	# mappable.set_clim(0,1)
 	ims = []
 	for i in range(len(cube)):
 		im = plt.imshow(cube[i],cmap=mappable.cmap, 
-			interpolation = "sinc",animated=True)
+			interpolation = "spline36",animated=True)
 		ims.append([im])
 		#plt.savefig("imagen_"+str(i))
 	ani = animation.ArtistAnimation(fig,ims, interval = 50,blit=True,repeat_delay=1000)

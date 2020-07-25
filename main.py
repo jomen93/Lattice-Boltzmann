@@ -3,8 +3,8 @@ import numpy as np
 from utils import plot_3d, Animation
 import matplotlib.pyplot as plt
 
-Nx = 64
-Ny = 64
+Nx = 256
+Ny = 256
 tfin = 1000
 
 x = LatticeBoltzmann(Nx,Ny)
@@ -18,13 +18,14 @@ for t in range(tfin):
 	x.Feq_fluids()
 	x.Collision()
 	x.Streaming()
-	x.Boundaries()
+	# x.Bounce_Back()
+	x.Free_Boundaries()
 	if (t%5 == 0):
 		ims_den.append(x.rho)
 		ims_vel.append(np.sqrt(x.J[0]**2+x.J[1]**2))
 	print("simulation_progess = {:.2f}".format((t/tfin)*100)+"%\r",end ="")
 print("")
 print("Simulation_done")
-Animation(ims_vel,"velocity_fluids")
-Animation(ims_den,"density_fluids")
+Animation(ims_vel,"velocity_fluids",plt.cm.seismic)
+Animation(ims_den,"density_fluids",plt.cm.autumn)
 print("Aniamtion_done")

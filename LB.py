@@ -64,11 +64,22 @@ class LatticeBoltzmann(object):
 		return self.feq
 
 	def Init(self):
-		x_length = int(self.Nx/256); y_length = int(self.Nx/256)
+		x_length = 2; y_length = 2
 		x_c = int(2*self.Nx/6); y_c = int(self.Nx/2)
 		x_c1 = int(4*self.Nx/6); y_c1 = int(self.Nx/2)
-		self.rho[x_c-x_length:x_c+x_length,y_c-y_length:y_c+y_length] = 1.001
-		self.rho[x_c1-x_length:x_c1+x_length,y_c1-y_length:y_c1+y_length] = 1.001
+		self.rho[x_c-x_length:x_c+x_length,y_c-y_length:y_c+y_length] = 10
+		self.rho[x_c1-x_length:x_c1+x_length,y_c1-y_length:y_c1+y_length] = 10
+
+		# Definition of initial condition of sinc function
+		x = np.linspace(0,self.Nx,self.Nx)
+		y = np.linspace(0,self.Ny,self.Ny)
+		x,y = np.meshgrid(x,y)
+
+		def sinc(x,y):
+			# return np.exp(-(x**2+y**2)*0.5)
+			return (x-self.Nx/2.)**2+(y-self.Ny/2.)**2
+
+		# self.rho = sinc(x,y)
 		self.f = self.Feq()	
 
 	# Calculate macroscopic variables
@@ -84,7 +95,6 @@ class LatticeBoltzmann(object):
 		for i in range(self.Q):
 			self.f[i,:,:] = np.roll(np.roll(self.f_post[i,:,:],self.v[i,0],axis = 0),self.v[i,1],axis=1)
 
-
 	#### implementation Boundary conditions in Fluids ###
 	"""
 	We focused on analitycal and standard numerical procedures for boundary conditions 
@@ -94,9 +104,17 @@ class LatticeBoltzmann(object):
 	#Bounce Back boundary condition 
 
 
+	def Bounce_Back(self):
+		# Left wall
+		self.f[self.right,0,:] = self.f_post[self.left,0,:]
+		# Right Wall
+		self.f[self.left,-1,:] = self.f_post[self.right,-1,:]
+		# Upper Wall
+		self.f[self.lower,:,-1] = self.f_post[self.upper,:,-1]
+		# Lower Wall
+		self.f[self.right,:,0] = self.f_post[self.left,:,-1]
 
-
-	def Boundaries(self):
+	def Free_Boundaries(self):
 		"""
 		Free boundary condition
 		"""
