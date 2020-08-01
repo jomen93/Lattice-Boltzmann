@@ -6,13 +6,24 @@ class LatticeBoltzmann(object):
 	"""docstring for LatticeBoltzmann"""
 	def __init__(self,Nx,Ny):
 		super(LatticeBoltzmann, self).__init__()
-		self.Nx = Nx
-		self.Ny = Ny
+		# definitios of adimensional parameters
+		self.Lx = 1								# m
+		self.Ly = 1								# m
+		self.T = 1								# s
+		self.Ux = 1								# m/s
+		self.Uy = 1								# m/s
+		self.Rho = 1.29 						# kg/m2 air density
+		self.Tau = 0.6							# Relaxation time 
+		self.Nu = 0.1							# Kinematic Viscocity
+
+		# From this point all variables are adimensional 
+		self.Nx = int(Nx/self.Lx)
+		self.Ny = int(Ny/self.Ly)
 		self.dt = 1
-		self.tau = 0.5 
+		self.tau = self.Tau/self.T 
 		self.W = self.dt/self.tau; 
 		self.Wp = 1-self.W
-		self.c2 = 3/5.
+		self.c2 = 1/3.
 
 
 		# Parameteres od lattice D2Q9
@@ -28,15 +39,23 @@ class LatticeBoltzmann(object):
 		self.upper = np.arange(self.Q)[np.asarray([ci[1]>0  for ci in self.v])] 
 		self.lower = np.arange(self.Q)[np.asarray([ci[1]<0  for ci in self.v])]
 
-		#fluid Parameters
+		# fluid Parameters
 		# Reynolds number
-		self.Re = 220.0
+		# kinematic viscosity
+		self.nu = self.c2*(self.tau-0.5)
+		# Reynolds Number
+		self.Re = (self.Lx*self.Ux)/self.nu
+		# Relaxation parameters
+		self.omega = self.dt/self.tau
+
+
+		# self.Re = 220.0	
 		# characteristic length 
-		L = (self.Nx*self.Ny)
+		# L = (self.Nx*self.Ny)
 		# Velocity in lattice units
-		uLB = 0.04; nulb = uLB*L/self.Re
+		# uLB = 0.04; nulb = uLB*L/self.Re
 		# Relaxation parameters 
-		self.omega = 1.0/(3.*(uLB*L/self.Re)+0.5)
+		# self.omega = 1.0/(3.*(uLB*L/self.Re)+0.5)
 
 		
 		# initialization macroscopic variables
@@ -51,10 +70,10 @@ class LatticeBoltzmann(object):
 		self.f_post = np.zeros((self.Q,Nx,Ny))
 	
 	def Feq(self):
-			self.feq[0] = self.rho*(1-3*self.c2*(1-self.w[0]))
-			for i in range(1,self.Q):
-				self.feq[i,:,:] = 3*self.w[i]*(self.c2*self.rho +self.v[i][0]*self.J[0]+self.v[i][1]*self.J[1])
-			return self.feq
+		self.feq[0] = self.rho*(1-3*self.c2*(1-self.w[0]))
+		for i in range(1,self.Q):
+			self.feq[i,:,:] = 3*self.w[i]*(self.c2*self.rho +self.v[i][0]*self.J[0]+self.v[i][1]*self.J[1])
+		return self.feq
 
 	def Feq_fluids(self):
 		cu = 3.0*np.dot(self.v,self.J.transpose(1,0,2))
@@ -105,6 +124,8 @@ class LatticeBoltzmann(object):
 
 
 	def Bounce_Back(self):
+
+		# this module changes acord to specific problem and obstacle
 		# Left wall
 		self.f[self.right,0,:] = self.f_post[self.left,0,:]
 		# Right Wall
@@ -114,7 +135,7 @@ class LatticeBoltzmann(object):
 		# Lower Wall
 		self.f[self.right,:,0] = self.f_post[self.left,:,-1]
 
-	def Free_Boundaries(self):
+	def Boundaries(self):
 		"""
 		Free boundary condition
 		"""
@@ -152,7 +173,6 @@ class LatticeBoltzmann(object):
 		
 
 		
-	
 
 		
 

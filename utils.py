@@ -43,7 +43,7 @@ def Animation(cube,name,color):
 	x = np.arange(np.shape(cube)[0])
 	y = np.arange(np.shape(cube)[0])
 	
-	mappable = plt.cm.ScalarMappable(cmap = plt.cm.viridis)
+	mappable = plt.cm.ScalarMappable(cmap = color)
 	mappable.set_array(cube[-1])
 	# mappable.set_clim(0,1)
 	ims = []

@@ -3,9 +3,9 @@ import numpy as np
 from utils import plot_3d, Animation
 import matplotlib.pyplot as plt
 
-Nx = 256
-Ny = 256
-tfin = 1000
+Nx = 512
+Ny = 512
+tfin = 500
 
 x = LatticeBoltzmann(Nx,Ny)
 
@@ -13,13 +13,15 @@ x.Init()
 ims_vel = []
 ims_den = []
 #plot_3d(x.rho,"rho")
+print("Reynolds Number :", x.Re)
 for t in range(tfin):
 	x.Macroscopic()
 	x.Feq_fluids()
+	# x.Feq()
 	x.Collision()
 	x.Streaming()
 	# x.Bounce_Back()
-	x.Free_Boundaries()
+	x.Boundaries()
 	if (t%5 == 0):
 		ims_den.append(x.rho)
 		ims_vel.append(np.sqrt(x.J[0]**2+x.J[1]**2))
