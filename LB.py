@@ -13,7 +13,7 @@ class LatticeBoltzmann(object):
 		self.Ux = 1								# m/s
 		self.Uy = 1								# m/s
 		self.Rho = 1	 						# kg/m2 air density
-		self.Tau = 0.6							# Relaxation time 
+		self.Tau = 0.501						# Relaxation time 
 		self.Nu = 0.1							# Kinematic Viscocity
 
 		# From this point all variables are adimensional 
@@ -86,30 +86,37 @@ class LatticeBoltzmann(object):
 		return self.f
 
 	def Init(self):
-		# x_length = 2; y_length = 2
-		# x_c = int(2*self.Nx/6); y_c = int(self.Nx/2)
-		# x_c1 = int(4*self.Nx/6); y_c1 = int(self.Nx/2)
-		# self.rho[x_c-x_length:x_c+x_length,y_c-y_length:y_c+y_length] = 1.1
 		self.f = self.Feq_fluids()	
 
 	# Calculate macroscopic variables
-	def Macroscopic(self,t):
-		self.rho = np.sum(self.f,axis = 0) + 0.5*self.dt*np.sum(self.Source(t),axis = 0)
+	def Macroscopic(self):
+		self.rho = np.sum(self.f,axis = 0) + 0.5*self.dt*np.sum(self.Source(),axis = 0)
 		self.u = np.dot(self.v.transpose(),self.f.transpose((1,0,2)))/self.rho + 0.5*self.dt*self.F/self.rho
 
-	def Source(self,t):
+	def Source(self):
 		cuS = 3.0*np.dot(self.v,self.u.transpose(1,0,2))
 		usqrS = 3/2.*(self.u[0]**2+self.u[1]**2)
 
-		r = 4
-		x_c1 = int(2*self.Nx/6); y_c1 = int(self.Nx/2)
-		y,x = np.ogrid[-x_c1:self.Nx-x_c1, -y_c1:self.Ny-y_c1]
-		mask = x**2 + y**2 < r**2
+		r1 = 4
+		r2 = 4
+		x_c1 = int(3*self.Nx/10); y_c1 = int(self.Nx/2)
+		x_c2 = int(7*self.Nx/10); y_c2 = int(self.Nx/2)
+
+		y1,x1 = np.ogrid[-x_c1:self.Nx-x_c1, -y_c1:self.Ny-y_c1]
+		y2,x2 = np.ogrid[-x_c2:self.Nx-x_c2, -y_c1:self.Ny-y_c2]
+		
+		mask1 = x1**2 + y1**2 < r1**2
+		mask2 = x2**2 + y2**2 < r2**2
 
 		for i in range(self.Q):
-			qo = 1e-2*np.cos(t/0.03)**2
-			aux = self.w[i]*(1.+cuS[i]+0.5*cuS[i]**2-usqrS)*qo
-			self.f_Source[i,mask] = aux[mask]
+			qo1 = 1e-2#*np.cos(t/0.03)**2
+			qo2 = 5e-2#*np.cos(t/0.03)**2
+
+			aux = self.w[i]*(1.+cuS[i]+0.5*cuS[i]**2-usqrS)
+
+			self.f_Source[i,mask1] = aux[mask1]*qo1
+			self.f_Source[i,mask2] = aux[mask2]*qo2
+
 		return self.f_Source
 
 	def Force(self):
@@ -121,10 +128,10 @@ class LatticeBoltzmann(object):
 			self.f_Force[i,:,:] = self.w[i]*(cuF[i]+0.5*cuF[i]**2-usqrF)
 		return self.f_Force
 		
-	def Collision(self,t):
+	def Collision(self):
 		self.f_post = (1-self.omega)*self.f+self.omega*self.Feq_fluids()
 		# +(1.0-0.5*(self.omega))*self.Force()
-		+(1.0-0.5*(self.omega))*self.Source(t)
+		+(1.0-0.5*(self.omega))*self.Source()
 		
 		
 	def Streaming(self):
@@ -198,13 +205,13 @@ class LatticeBoltzmann(object):
 
 	# obstacle 
 	# Definition of obstacle
-		r = 2
-		x_c1 = int(3*self.Nx/6); y_c1 = int(self.Nx/2)
-		y,x = np.ogrid[-x_c1:self.Nx-x_c1, -y_c1:self.Ny-y_c1]
-		mask = x**2 + y**2 < r**2
+		# r = 2
+		# x_c1 = int(3*self.Nx/6); y_c1 = int(self.Nx/2)
+		# y,x = np.ogrid[-x_c1:self.Nx-x_c1, -y_c1:self.Ny-y_c1]
+		# mask = x**2 + y**2 < r**2
 
 
-		self.f[:,mask] = self.f_post[:,mask]
+		# self.f[:,mask] = self.f_post[:,mask]
 
 		
 
