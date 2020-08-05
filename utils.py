@@ -49,7 +49,7 @@ def Animation(cube,name,color):
 	ims = []
 	for i in range(len(cube)):
 		im = plt.imshow(cube[i],cmap=mappable.cmap, 
-			interpolation = "spline36",animated=True)
+			interpolation = "gaussian",animated=True)
 		ims.append([im])
 		#plt.savefig("imagen_"+str(i))
 	ani = animation.ArtistAnimation(fig,ims, interval = 50,blit=True,repeat_delay=1000)

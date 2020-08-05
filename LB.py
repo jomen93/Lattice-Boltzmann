@@ -12,7 +12,7 @@ class LatticeBoltzmann(object):
 		self.T = 1								# s
 		self.Ux = 1								# m/s
 		self.Uy = 1								# m/s
-		self.Rho = 1.29 						# kg/m2 air density
+		self.Rho = 1	 						# kg/m2 air density
 		self.Tau = 0.6							# Relaxation time 
 		self.Nu = 0.1							# Kinematic Viscocity
 
@@ -60,59 +60,85 @@ class LatticeBoltzmann(object):
 		
 		# initialization macroscopic variables
 		self.rho = np.ones((Nx,Ny))
-		self.J = np.zeros((self.D,Nx,Ny))
-		#self.Jy = np.zeros((Nx,Ny))
+		self.u = np.zeros((self.D,Nx,Ny))
+		self.F = np.zeros((self.D,Nx,Ny))
 
-		# definition of matrix distribution
+		# definition of distributions
 		self.feq = np.zeros((self.Q,Nx,Ny))
 		self.f = np.zeros((self.Q,Nx,Ny))
+		self.f_Force = np.zeros((self.Q,Nx,Ny))
+		self.f_Source = np.zeros((self.Q,Nx,Ny))
+
 		# Initialization auxiliar varible to streaming process
 		self.f_post = np.zeros((self.Q,Nx,Ny))
 	
 	def Feq(self):
 		self.feq[0] = self.rho*(1-3*self.c2*(1-self.w[0]))
 		for i in range(1,self.Q):
-			self.feq[i,:,:] = 3*self.w[i]*(self.c2*self.rho +self.v[i][0]*self.J[0]+self.v[i][1]*self.J[1])
+			self.feq[i,:,:] = 3*self.w[i]*(self.c2*self.rho +self.v[i][0]*self.u[0]+self.v[i][1]*self.u[1])
 		return self.feq
 
 	def Feq_fluids(self):
-		cu = 3.0*np.dot(self.v,self.J.transpose(1,0,2))
-		usqr = 3/2.*(self.J[0]**2+self.J[1]**2)
+		cu = 3.0*np.dot(self.v,self.u.transpose(1,0,2))
+		usqr = 3/2.*(self.u[0]**2+self.u[1]**2)
 		for i in range(self.Q):
 			self.f[i,:,:] = self.rho*self.w[i]*(1.+cu[i]+0.5*cu[i]**2-usqr)
-		return self.feq
+		return self.f
 
 	def Init(self):
-		x_length = 2; y_length = 2
-		x_c = int(2*self.Nx/6); y_c = int(self.Nx/2)
-		x_c1 = int(4*self.Nx/6); y_c1 = int(self.Nx/2)
-		self.rho[x_c-x_length:x_c+x_length,y_c-y_length:y_c+y_length] = 10
-		self.rho[x_c1-x_length:x_c1+x_length,y_c1-y_length:y_c1+y_length] = 10
-
-		# Definition of initial condition of sinc function
-		x = np.linspace(0,self.Nx,self.Nx)
-		y = np.linspace(0,self.Ny,self.Ny)
-		x,y = np.meshgrid(x,y)
-
-		def sinc(x,y):
-			# return np.exp(-(x**2+y**2)*0.5)
-			return (x-self.Nx/2.)**2+(y-self.Ny/2.)**2
-
-		# self.rho = sinc(x,y)
-		self.f = self.Feq()	
+		# x_length = 2; y_length = 2
+		# x_c = int(2*self.Nx/6); y_c = int(self.Nx/2)
+		# x_c1 = int(4*self.Nx/6); y_c1 = int(self.Nx/2)
+		# self.rho[x_c-x_length:x_c+x_length,y_c-y_length:y_c+y_length] = 1.1
+		self.f = self.Feq_fluids()	
 
 	# Calculate macroscopic variables
-	def Macroscopic(self):
-		self.rho = np.sum(self.f,axis = 0)
-		self.J = np.dot(self.v.transpose(),self.f.transpose((1,0,2)))/self.rho
-		
-	def Collision(self):
-		self.f_post = self.f - self.omega*(self.f-self.Feq())
-		#self.f_post = self.Wp*self.f + self.W*self.Feq()
+	def Macroscopic(self,t):
+		self.rho = np.sum(self.f,axis = 0) + 0.5*self.dt*np.sum(self.Source(t),axis = 0)
+		self.u = np.dot(self.v.transpose(),self.f.transpose((1,0,2)))/self.rho + 0.5*self.dt*self.F/self.rho
 
+	def Source(self,t):
+		cuS = 3.0*np.dot(self.v,self.u.transpose(1,0,2))
+		usqrS = 3/2.*(self.u[0]**2+self.u[1]**2)
+
+		r = 4
+		x_c1 = int(2*self.Nx/6); y_c1 = int(self.Nx/2)
+		y,x = np.ogrid[-x_c1:self.Nx-x_c1, -y_c1:self.Ny-y_c1]
+		mask = x**2 + y**2 < r**2
+
+		for i in range(self.Q):
+			qo = 1e-2*np.cos(t/0.03)**2
+			aux = self.w[i]*(1.+cuS[i]+0.5*cuS[i]**2-usqrS)*qo
+			self.f_Source[i,mask] = aux[mask]
+		return self.f_Source
+
+	def Force(self):
+		g = 0.0001
+		self.F[0] = -g*self.rho
+		cuF = 3.0*np.dot(self.v,self.F.transpose(1,0,2))
+		usqrF = 3/2.*(self.F[0]*self.u[0]+self.F[1]*self.u[1])
+		for i in range(self.Q):
+			self.f_Force[i,:,:] = self.w[i]*(cuF[i]+0.5*cuF[i]**2-usqrF)
+		return self.f_Force
+		
+	def Collision(self,t):
+		self.f_post = (1-self.omega)*self.f+self.omega*self.Feq_fluids()
+		# +(1.0-0.5*(self.omega))*self.Force()
+		+(1.0-0.5*(self.omega))*self.Source(t)
+		
+		
 	def Streaming(self):
 		for i in range(self.Q):
 			self.f[i,:,:] = np.roll(np.roll(self.f_post[i,:,:],self.v[i,0],axis = 0),self.v[i,1],axis=1)
+
+
+
+
+
+
+
+
+
 
 	#### implementation Boundary conditions in Fluids ###
 	"""
@@ -169,6 +195,16 @@ class LatticeBoltzmann(object):
 		self.f[6,0,0] = self.f[6,1,1]
 		self.f[8,0,0] = self.f[8,1,1]
 		self.f[0,0,0] = self.f[0,1,1]
+
+	# obstacle 
+	# Definition of obstacle
+		r = 2
+		x_c1 = int(3*self.Nx/6); y_c1 = int(self.Nx/2)
+		y,x = np.ogrid[-x_c1:self.Nx-x_c1, -y_c1:self.Ny-y_c1]
+		mask = x**2 + y**2 < r**2
+
+
+		self.f[:,mask] = self.f_post[:,mask]
 
 		
 
