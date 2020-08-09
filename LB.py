@@ -13,7 +13,7 @@ class LatticeBoltzmann(object):
 		self.Ux = 1								# m/s
 		self.Uy = 1								# m/s
 		self.Rho = 1	 						# kg/m2 air density
-		self.Tau = 0.501						# Relaxation time 
+		self.Tau = 0.51							# Relaxation time 
 		self.Nu = 0.1							# Kinematic Viscocity
 
 		# From this point all variables are adimensional 
@@ -90,7 +90,11 @@ class LatticeBoltzmann(object):
 
 	# Calculate macroscopic variables
 	def Macroscopic(self):
-		self.rho = np.sum(self.f,axis = 0) + 0.5*self.dt*np.sum(self.Source(),axis = 0)
+		self.rho = np.sum(self.f,axis = 0) 
+		# self.u = np.dot(self.v.transpose(),self.f.transpose((1,0,2)))/self.rho 
+
+		# force and source quatities
+		# self.rho = np.sum(self.f,axis = 0) + 0.5*self.dt*np.sum(self.Source(),axis = 0)
 		self.u = np.dot(self.v.transpose(),self.f.transpose((1,0,2)))/self.rho + 0.5*self.dt*self.F/self.rho
 
 	def Source(self):
@@ -119,9 +123,9 @@ class LatticeBoltzmann(object):
 
 		return self.f_Source
 
-	def Force(self):
-		g = 0.0001
-		self.F[0] = -g*self.rho
+	def Pouseuille_Force(self):
+		g = 1e-6
+		self.F[1] = -g*self.rho
 		cuF = 3.0*np.dot(self.v,self.F.transpose(1,0,2))
 		usqrF = 3/2.*(self.F[0]*self.u[0]+self.F[1]*self.u[1])
 		for i in range(self.Q):
@@ -130,8 +134,8 @@ class LatticeBoltzmann(object):
 		
 	def Collision(self):
 		self.f_post = (1-self.omega)*self.f+self.omega*self.Feq_fluids()
-		# +(1.0-0.5*(self.omega))*self.Force()
-		+(1.0-0.5*(self.omega))*self.Source()
+		+(1.0-0.5*(self.omega))*self.Pouseuille_Force()
+		# +(1.0-0.5*(self.omega))*self.Source()
 		
 		
 	def Streaming(self):
@@ -166,7 +170,7 @@ class LatticeBoltzmann(object):
 		# Upper Wall
 		self.f[self.lower,:,-1] = self.f_post[self.upper,:,-1]
 		# Lower Wall
-		self.f[self.right,:,0] = self.f_post[self.left,:,-1]
+		self.f[self.upper,:,0] = self.f_post[self.lower,:,0]
 
 	def Boundaries(self):
 		"""
@@ -203,9 +207,24 @@ class LatticeBoltzmann(object):
 		self.f[8,0,0] = self.f[8,1,1]
 		self.f[0,0,0] = self.f[0,1,1]
 
+	def Pouseuille_Boundaries(self):
+		# Bounce Back in top and bottom boundaries to replicate the not slip 
+		# boundary conditions
+		self.f[self.upper,-1,:] = self.f_post[self.lower,-1,:]
+		self.f[self.lower,0,:] = self.f_post[self.upper,0,:]
+		
+		# Periodic boundaries in left and right boundaries
+		self.f[self.right,:,0] = self.f_post[self.right,:,-1]
+		self.f[self.left,:,-1] = self.f_post[self.left,:,0]
+
+		
+
+
+
+
 	# obstacle 
 	# Definition of obstacle
-		# r = 2
+		# r = 16
 		# x_c1 = int(3*self.Nx/6); y_c1 = int(self.Nx/2)
 		# y,x = np.ogrid[-x_c1:self.Nx-x_c1, -y_c1:self.Ny-y_c1]
 		# mask = x**2 + y**2 < r**2
