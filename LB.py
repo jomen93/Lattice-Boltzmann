@@ -1,10 +1,8 @@
-
-import numpy as np 
-
+import numpy as np
 
 class LatticeBoltzmann(object):
 	"""docstring for LatticeBoltzmann"""
-	def __init__(self,Nx,Ny):
+	def __init__(self, Nx, Ny):
 		super(LatticeBoltzmann, self).__init__()
 		# definitios of adimensional parameters
 		self.Lx = 1								# m
@@ -13,7 +11,7 @@ class LatticeBoltzmann(object):
 		self.Ux = 1								# m/s
 		self.Uy = 1								# m/s
 		self.Rho = 1	 						# kg/m2 air density
-		self.Tau = 0.51							# Relaxation time 
+		self.Tau = 0.9							# Relaxation time 
 		self.Nu = 0.1							# Kinematic Viscocity
 
 		# From this point all variables are adimensional 
@@ -29,7 +27,9 @@ class LatticeBoltzmann(object):
 		# Parameteres od lattice D2Q9
 		self.D = 2; self.Q = 9 
 		self.v = np.array([(x,y) for x in [0,-1,1] for y in [0,-1,1]])
-		self.w = np.array([4.0/9 ,1.0/9 ,1.0/9 ,1.0/9 ,1.0/36 ,1.0/36 ,1.0/9,1.0/36,1.0/36.]) 
+		self.w = 1/36. *np.ones(self.Q)
+		self.w[np.asarray([np.linalg.norm(ci)<1.1 for ci in self.v])] = 1./9.; self.w[0] =4./9.
+		# self.w = np.array([4.0/9 ,1.0/9 ,1.0/9 ,1.0/9 ,1.0/36 ,1.0/36 ,1.0/9,1.0/36,1.0/36.]) 
 
 		self.left = np.arange(self.Q)[np.asarray([ci[0]<0  for ci in self.v])] 
 		self.right = np.arange(self.Q)[np.asarray([ci[0]>0  for ci in self.v])] 
@@ -42,20 +42,21 @@ class LatticeBoltzmann(object):
 		# fluid Parameters
 		# Reynolds number
 		# kinematic viscosity
-		self.nu = self.c2*(self.tau-0.5)
 		# Reynolds Number
-		self.Re = (self.Lx*self.Ux)/self.nu
+		# self.Re = (self.Lx*self.Ux)/self.nu
 		# Relaxation parameters
-		self.omega = self.dt/self.tau
+		# self.omega = self.dt/self.tau
 
 
-		# self.Re = 220.0	
+		self.Re = 100.0	
 		# characteristic length 
-		# L = (self.Nx*self.Ny)
+		L = (self.Nx*self.Ny)
 		# Velocity in lattice units
-		# uLB = 0.04; nulb = uLB*L/self.Re
+		uLB = 0.04; nulb = uLB*L/self.Re
 		# Relaxation parameters 
-		# self.omega = 1.0/(3.*(uLB*L/self.Re)+0.5)
+		self.omega = 1.0/(3.*(uLB*L/self.Re)+0.5)
+		self.nu = nulb
+
 
 		
 		# initialization macroscopic variables
@@ -95,7 +96,19 @@ class LatticeBoltzmann(object):
 
 		# force and source quatities
 		# self.rho = np.sum(self.f,axis = 0) + 0.5*self.dt*np.sum(self.Source(),axis = 0)
-		self.u = np.dot(self.v.transpose(),self.f.transpose((1,0,2)))/self.rho + 0.5*self.dt*self.F/self.rho
+		self.u = np.dot(self.v.transpose(),self.f.transpose((1,0,2)))/np.sum(self.f,axis=0) + 0.5*self.dt*self.F/np.sum(self.f, axis = 0)
+
+	def VonKarman_Macroscopic(self):
+		self.rho = np.sum(self.f,axis = 0) 
+		self.u = np.dot(self.v.transpose(),self.f.transpose((1,0,2)))/self.rho 
+
+		cx = self.Nx/4; cy=self.Ny/2; r=self.Ny/9 # coordinates of the cylinder 
+		uLB = 0.04;ly=self.Ny-1.0
+		vel = np.fromfunction(lambda d,x,y: (1-d)*uLB*(1.0+1e-4*np.sin(y/ly*2*np.pi)),(2,self.Nx,self.Ny))
+
+		self.u[:,0,:] = vel[:,0,:] # Left
+		self.rho[0,:] = 1./(1.-self.u[0,0,:]) * (np.sum(self.f[self.center,0,:],axis = 0)+2.*np.sum(self.f[self.left,0,:],axis = 0))
+
 
 	def Source(self):
 		cuS = 3.0*np.dot(self.v,self.u.transpose(1,0,2))
@@ -164,13 +177,13 @@ class LatticeBoltzmann(object):
 
 		# this module changes acord to specific problem and obstacle
 		# Left wall
-		self.f[self.right,0,:] = self.f_post[self.left,0,:]
+		self.f[self.right,:,0] = self.f_post[self.left,:,0]
 		# Right Wall
-		self.f[self.left,-1,:] = self.f_post[self.right,-1,:]
+		self.f[self.left,:,-1] = self.f_post[self.right,:,-1]
 		# Upper Wall
-		self.f[self.lower,:,-1] = self.f_post[self.upper,:,-1]
+		self.f[self.lower,-1,:] = self.f_post[self.upper,-1,:]
 		# Lower Wall
-		self.f[self.upper,:,0] = self.f_post[self.lower,:,0]
+		self.f[self.upper,0,:] = self.f_post[self.lower,0,:]
 
 	def Boundaries(self):
 		"""
@@ -210,12 +223,41 @@ class LatticeBoltzmann(object):
 	def Pouseuille_Boundaries(self):
 		# Bounce Back in top and bottom boundaries to replicate the not slip 
 		# boundary conditions
+		# self.f[self.upper,0,:] = self.f_post[self.lower,0,:]
+		# self.f[self.lower,-1,:] = self.f_post[self.upper,-1,:]
+		# self.f[self.lower,0,:] = self.f_post[self.upper,0,:]
+		# self.f[self.upper,-1,:] = self.f_post[self.lower,-1,:]
+		
 		self.f[self.upper,-1,:] = self.f_post[self.lower,-1,:]
 		self.f[self.lower,0,:] = self.f_post[self.upper,0,:]
-		
+
 		# Periodic boundaries in left and right boundaries
 		self.f[self.right,:,0] = self.f_post[self.right,:,-1]
 		self.f[self.left,:,-1] = self.f_post[self.left,:,0]
+
+		# self.f[6,:,0] = self.f_post[6,:,-1]
+
+		# # corners
+		# # right upper
+		# self.f[8,-1,-1] = self.f_post[4,-1,-1]
+		# self.f[6,-1,-1] = self.f_post[3,-1,-1]
+		# self.f[2,-1,-1] = self.f_post[1,-1,-1]
+
+		# # left upper
+		# self.f[2,-1,0] = self.f_post[1,-1,0]
+		# self.f[5,-1,0] = self.f_post[7,-1,0]
+		# self.f[3,-1,0] = self.f_post[6,-1,0]
+
+		# # right lower
+		# self.f[7,0,-1] = self.f_post[5,0,-1]
+		# self.f[1,0,-1] = self.f_post[2,0,-1]
+		# self.f[6,0,-1] = self.f_post[3,0,-1]
+
+		# # left lower
+		# self.f[3,0,0] = self.f_post[6,0,0]
+		# self.f[4,0,0] = self.f_post[8,0,0]
+		# self.f[1,0,0] = self.f_post[2,0,0]
+
 
 		
 
@@ -232,9 +274,16 @@ class LatticeBoltzmann(object):
 
 		# self.f[:,mask] = self.f_post[:,mask]
 
-		
+	def VonKarman_boundaries(self):
+		# Right Wall: outflow condition 
+		self.f[self.right,-1,:] = self.f[self.right,-2,:]
+		# Left Wall
+		self.f[self.right,0,:] = self.f[self.left,0,:] + self.Feq_fluids()[self.right,0,:] - self.f[self.left,0,:]
+		cx = self.Nx/4; cy=self.Ny/2; r=self.Ny/9 # coordinates of the cylinder 
+		obstacle = np.fromfunction(lambda x,y: (x-cx)**2+(y-cy)**2<r**2, (self.Nx,self.Ny))
+		noslip = [self.v.tolist().index((-self.v[i]).tolist()) for i in range(self.Q)] 
+		for i in range(self.Q): self.f_post[i,obstacle] = self.f[noslip[i],obstacle]
 
-		
 
 		
 
