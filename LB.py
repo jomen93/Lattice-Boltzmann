@@ -258,8 +258,11 @@ class LatticeBoltzmann(object):
         self.f[self.r, -1, :] = self.f[self.r, -2, :]
         # l Wall
         self.f[self.r, 0, :] = self.f[self.l, 0, :] + self.Feq_fluids()[self.r, 0, :] - self.f[self.l, 0, :]
-        cx = self.Nx/4; cy=self.Ny/2; r=self.Ny/9 # coordinates of the cylinder 
+        # coordinates of the cylinder
+        cx = self.Nx/4
+        cy = self.Ny/2
+        r = self.Ny/9
         obstacle = np.fromfunction(lambda x, y: (x-cx)**2+(y-cy)**2 < r**2, (self.Nx, self.Ny))
         noslip = [self.v.tolist().index((-self.v[i]).tolist()) for i in range(self.Q)]
-        for i in range(self.Q): 
+        for i in range(self.Q):
             self.f_post[i, obstacle] = self.f[noslip[i], obstacle]

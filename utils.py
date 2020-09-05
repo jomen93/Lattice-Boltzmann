@@ -58,7 +58,7 @@ def Animation(cube,name,color):
 	plt.xlabel("$x$")
 	plt.ylabel("$y$")
 	plt.title("2D field solution")
-	ani.save(name+".gif",dpi=80,writer="imagemagick")
+	ani.save("Animations/"+name+".gif",dpi=80,writer="imagemagick")
 	# plt.show()
 
 
