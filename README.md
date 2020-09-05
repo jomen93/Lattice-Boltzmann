@@ -6,7 +6,9 @@ A fluid is a continuous medium in space, such a medium is thought of as a compos
 
 Fluids in the first approximation are described by the Euler equation, which in summary is to impose the conservation of mass, momentum and energy in the fluid, initially it is built considering that it is a reversible process, since energy losses are not assumed, Euler's equation is written
 
+<div align = "center">
 <img src="https://latex.codecogs.com/gif.latex?\frac{\partial&space;(\rho&space;v_{i})}{\partial&space;t}&space;=&space;-\frac{\partial&space;\Pi_{ik}}{\partial&space;x_{k}}" title="\frac{\partial (\rho v_{i})}{\partial t} = -\frac{\partial \Pi_{ik}}{\partial x_{k}}" />
+</div>
 
 where 
 
