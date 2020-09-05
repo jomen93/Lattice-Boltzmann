@@ -1,5 +1,8 @@
 # Lattice-Boltzmann
- 
+
+
+
+
 ## Navier Stokes equations
 
 <p align = "justify">
@@ -16,15 +19,17 @@ Fluids in the first approximation are described by the Euler equation, which in 
 
 where 
 
+<div align="center">
 <img src="https://latex.codecogs.com/gif.latex?\Pi_{ik}&space;=&space;p\delta_{ik}&space;&plus;&space;\rho&space;v_{i}v_{k}" title="\Pi_{ik} = p\delta_{ik} + \rho v_{i}v_{k}" />
+</div>
 
 <p align="justify">
 This quantity represents a momentum transfer (reversible process) given by the mechanical transport of the fluid particles in space. The starting point to obtain the dynamics of Navier Stokes will be to consider that the viscosity is due to a moment transfer where energy is not conserved, therefore there is an irreversible process, from places where the speed is great to others where speed is small. Then in the definition of the impulse tensor a term is added that accounts for the transfer of viscous impulse. Thus
 </p>
 
-<div lang="center">
+<p lang="center">
 <img src="https://latex.codecogs.com/gif.latex?\Pi_{ik}&space;=&space;p\delta_{ik}&space;&plus;&space;\rho&space;v_{i}v_{k}&space;-&space;\sigma^{'}_{ik}=-\sigma_{ik}&plus;\rho&space;v_{i}v_{k}" title="\Pi_{ik} = p\delta_{ik} + \rho v_{i}v_{k} - \sigma^{'}_{ik}=-\sigma_{ik}+\rho v_{i}v_{k}" />
-</div>
+</p>
 
 <p align="justify">
 defining the stress tensor <img src="https://latex.codecogs.com/gif.latex?\sigma_{ik}" title="\sigma_{ik}" /> and similarly the viscosity stress tensor <img src="https://latex.codecogs.com/gif.latex?\sigma^{'}_{ik}" title="\sigma^{'}_{ik}" />,the latter is considered to express the part of the moment that is not transferred as moment, that is, only by internal friction processes. To find the shape of the viscosity stress tensor, the foundation of fluid particles is studied. The only way that there is friction is to assume that between the fluid particles they have different speeds, therefore there is a relative movement of them, then two approximations are made; in the first approximation, it is assumed that <img src="https://latex.codecogs.com/gif.latex?\sigma^{'}_{ik}" title="\sigma^{'}_{ik}" /> depends on the spatial derivatives of the velocity, in addition it only depends on the first derivatives and its relationship is linear, since <img src="https://latex.codecogs.com/gif.latex?\sigma^{'}_{ik}" title="\sigma^{'}_{ik}" /> must be overridden for <img src="https://latex.codecogs.com/gif.latex?v&space;=&space;\text{cte}" title="v = \text{cte}" />. The second condition that is imposed is that  <img src="https://latex.codecogs.com/gif.latex?\sigma^{'}_{ik}" title="\sigma^{'}_{ik}" /> it must be canceled when there is uniform rotation, since in such a situation there is no internal friction in the fluid. The tensor that satisfies these conditions has the following form
