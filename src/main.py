@@ -1,11 +1,11 @@
 from LB import LatticeBoltzmann
 import numpy as np
-from utils import Animation
+from utils import Animation, plot_3d
 import matplotlib.pyplot as plt
 
-Nx = 128
-Ny = 128
-tfin = 1000
+Nx = 64
+Ny = 64
+tfin = 15000
 
 x = LatticeBoltzmann(Nx, Ny)
 
@@ -19,7 +19,6 @@ for t in range(tfin):
     x.Feq_fluids()
     x.Collision()
     x.Streaming()
-    # x.Bounce_Back()
     x.Pouseuille_Boundaries()
     # Save images each 50 steps
     if (t % 50 == 0):
@@ -29,6 +28,7 @@ for t in range(tfin):
 np.savetxt('ux.dat', x.u[0])
 np.savetxt('uy.dat', x.u[1])
 np.savetxt('rho.dat', x.rho)
+plot_3d(np.sqrt(x.u[0]**2+x.u[1]**2), "norm_velocity", plt.cm.viridis)
 print("viscocity in lattice units :", x.nu)
 print("density in lattice units :", np.mean(x.rho))
 print("")

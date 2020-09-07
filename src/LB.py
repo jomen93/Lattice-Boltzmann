@@ -1,5 +1,4 @@
 import numpy as np
-#coment
 
 
 class LatticeBoltzmann(object):
@@ -97,22 +96,8 @@ class LatticeBoltzmann(object):
         # force and source quatities
         #self.rho = np.sum(self.f,axis = 0) +
         # 0.5*self.dt*np.sum(self.Source(),axis = 0)
-        F_ext = 0.5*self.dt*self.F/np.sum(self.f, axis=0)
-        self.u = np.dot(self.v.transpose(), self.f.transpose((1, 0, 2)))/self.rho + F_ext
-
-    def VonKarman_Macroscopic(self):
-        self.rho = np.sum(self.f, axis=0)
-        self.u = np.dot(self.v.transpose(), self.f.transpose((1, 0, 2)))/self.rho
-        # coordinates of the cylinder
-        # cx = self.Nx/4
-        # cy = self.Ny/2
-        # r = self.Ny/9
-        uLB = 0.04
-        ly = self.Ny-1.0
-        vel = np.fromfunction(lambda d, x, y: (1-d)*uLB*(1.0+1e-4*np.sin(y/ly*2*np.pi)), (2, self.Nx, self.Ny))
-
-        self.u[:, 0, :] = vel[:, 0, :]
-        self.rho[0, :] = 1./(1.-self.u[0, 0, :])*(np.sum(self.f[self.c, 0, :], axis=0)+2.*np.sum(self.f[self.l, 0, :], axis=0))
+        self.u = (np.dot(self.v.transpose(), self.f.transpose((1, 0, 2))) +
+                  0.5*self.dt*self.F)/self.rho
 
     def Source(self):
         cuS = 3.0*np.dot(self.v, self.u.transpose(1, 0, 2))
@@ -167,61 +152,16 @@ class LatticeBoltzmann(object):
     #### implementation Boundary conditions in Fluids ###
     # We focused on analitycal and standard numerical procedures
     # for boundary conditions in fluid flow problems.
-    #Bounce Back boundary condition
-
-    def Bounce_Back(self):
-    # this module changes acord to specific problem and obstacle
-        # l wall
-        self.f[self.r, :, 0] = self.f_post[self.l, :, 0]
-        # r Wall
-        self.f[self.l, :, -1] = self.f_post[self.r, :, -1]
-        # up Wall
-        self.f[self.low, -1, :] = self.f_post[self.up, -1, :]
-        # low Wall
-        self.f[self.up, 0, :] = self.f_post[self.low, 0, :]
-
-    def Boundaries(self):
-    # Free boundary condition
-        # r wall
-        self.f[self.l, -1, :] = self.f[self.l, -2, :]
-        # l wall
-        self.f[self.r, 0, :] = self.f[self.r, 1, :]
-        # up wall
-        self.f[self.low, :, -1] = self.f[self.low, :, -2]
-        # low wall
-        self.f[self.up, :, 0] = self.f[self.up, :, 1]
-        # corners
-        # r uppper
-        self.f[1, -1, -1] = self.f[1, -2, -2]
-        self.f[3, -1, -1] = self.f[3, -2, -2]
-        self.f[4, -1, -1] = self.f[4, -2, -2]
-        self.f[0, -1, -1] = self.f[0, -2, -2]
-        # l up
-        self.f[6, 0, -1] = self.f[6, 1, -2]
-        self.f[1, 0, -1] = self.f[1, 1, -2]
-        self.f[7, 0, -1] = self.f[7, 1, -2]
-        self.f[0, 0, -1] = self.f[0, 1, -2]
-        # r low
-        self.f[2, -1, 0] = self.f[2, -1, 1]
-        self.f[3, -1, 0] = self.f[3, -1, 1]
-        self.f[5, -1, 0] = self.f[5, -1, 1]
-        self.f[0, -1, 0] = self.f[0, -1, 1]
-        # l low
-        self.f[2, 0, 0] = self.f[2, 1, 1]
-        self.f[6, 0, 0] = self.f[6, 1, 1]
-        self.f[8, 0, 0] = self.f[8, 1, 1]
-        self.f[0, 0, 0] = self.f[0, 1, 1]
+    # Bounce Back boundary condition
 
     def Pouseuille_Boundaries(self):
         # Bounce Back in top and bottom boundaries to replicate the not slip
         # boundary conditions
 
         self.f[self.up, -1, :] = self.f_post[self.low, -1, :]
-        self.f[self.low, 0, :] = self.f_post[self.up, 0, :]
+        self.f[self.up, 0, :] = self.f_post[self.low, 0, :]
 
-        # Periodic boundaries in l and r boundaries
-        self.f[self.r, :, 0] = self.f_post[self.r, :, -1]
-        self.f[self.l, :, -1] = self.f_post[self.l, :, 0]
-
-
-   
+        # # Periodic boundaries in l and r boundaries
+        # self.f[self.r, :, 0] = self.f_post[self.r, :, -1]
+        # self.f[self.l, :, -1] = self.f_post[self.l, :, 0]
+        #   

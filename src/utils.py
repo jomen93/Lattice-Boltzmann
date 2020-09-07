@@ -3,6 +3,7 @@ matplotlib.use("TKAgg")
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import numpy as np
+from mpl_toolkits.mplot3d import Axes3D
 
 
 def plot_3d(data, name, color):
@@ -16,7 +17,7 @@ def plot_3d(data, name, color):
     #mappable.set_clim(0.5,1.1)
 
     fig = plt.figure(figsize=(10, 4))
-    ax1 = fig.add_subplot(121, projection="3d")
+    ax1 = fig.add_subplot(122, projection="3d")
     ax1.plot_surface(x, y, data, cmap=mappable.cmap, norm=mappable.norm,
                      linewidth=0, antialiased=False)
     ax1.set_xlabel("x")
@@ -26,21 +27,19 @@ def plot_3d(data, name, color):
     ax1.set_ylim(np.min(Y), np.max(Y))
     #ax1.set_zlim(0.5,1.1)
 
-    ax2 = fig.add_subplot(122)
+    ax2 = fig.add_subplot(121)
     ax2.imshow(data, cmap=mappable.cmap, norm=mappable.norm,
                extent=(np.min(x),
                        np.max(x),
                        np.min(y),
                        np.max(y)), interpolation = "none")
+    plt.savefig(name, dpi=1000)
     plt.colorbar(mappable)
     plt.tight_layout()
-    plt.show()
 
 
 def Animation(cube, name, color):
     fig = plt.figure()
-    #Writer = animation.writers['ffmpeg']
-    #writer = Writer(fps=15, metadata=dict(artist='Me'), bitrate=1800)
     # x = np.arange(np.shape(cube)[0])
     # y = np.arange(np.shape(cube)[0])
 
