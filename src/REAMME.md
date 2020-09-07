@@ -1,3 +1,0 @@
-# Source
-
-Lattice boltzmann implementation 
