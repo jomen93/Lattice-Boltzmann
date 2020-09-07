@@ -51,7 +51,7 @@ Implementation of method
 </p>
 
 <div align="justify">
-	Ahora para poder tener la parte discreta de la anterior ecuación se usa el teorema fundamental del cálculo, obteniendo 
+	Now in order to have the discrete part of the previous equation, the fundamental theorem of calculus is used, obtaining
 </div>
 
 <p align="center">

@@ -1,8 +1,5 @@
 # Lattice-Boltzmann
 
-
-
-
 ## Navier Stokes equations
 
 <p align = "justify">
