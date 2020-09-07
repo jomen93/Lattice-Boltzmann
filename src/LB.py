@@ -2,7 +2,7 @@ import numpy as np
 
 
 class LatticeBoltzmann(object):
-    def __init__(self, Nx, Ny):
+    def __init__(self, Nx, Ny, Rho, Tau):
         super(LatticeBoltzmann, self).__init__()
         # definitios of adimensional parameters
         self.Lx = 1                             # m
@@ -10,8 +10,8 @@ class LatticeBoltzmann(object):
         self.T = 1                              # s
         self.Ux = 1                             # m/s
         self.Uy = 1                             # m/s
-        self.Rho = 1                            # kg/m2 air density
-        self.Tau = 0.9                          # Relaxation time
+        self.Rho = Rho                          # kg/m2 air density
+        self.Tau = Tau                          # Relaxation time
         self.Nu = 0.1                           # Kinematic Viscocity
 
         # From this point all variables are adimensional
@@ -43,19 +43,19 @@ class LatticeBoltzmann(object):
         # Reynolds number
         # kinematic viscosity
         # Reynolds Number
-        # self.Re = (self.Lx*self.Ux)/self.nu
+        self.Re = (self.Lx*self.Ux)/self.Nu
         # Relaxation parameters
-        # self.omega = self.dt/self.tau
+        self.omega = self.dt/self.tau
 
-        self.Re = 100.0
+        # self.Re = 100.0
         # characteristic length
-        L = (self.Nx*self.Ny)
+        # L = (self.Nx*self.Ny)
         # Velocity in lattice units
-        uLB = 0.04
-        nulb = uLB*L/self.Re
+        # uLB = 0.04
+        # nulb = uLB*L/self.Re
         # Relaxation parameters
-        self.omega = 1.0/(3.*(uLB*L/self.Re)+0.5)
-        self.nu = nulb
+        # self.omega = 1.0/(3.*(uLB*L/self.Re)+0.5)
+        # self.Nu = nulb
 
         # initialization macroscopic variables
         self.rho = np.ones((Nx, Ny))

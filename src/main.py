@@ -1,13 +1,16 @@
-from LB import LatticeBoltzmann
+from LB import LatticeBoltzmann as LB
 import numpy as np
 from utils import Animation, plot_3d
 import matplotlib.pyplot as plt
+import user
 
-Nx = 64
-Ny = 64
-tfin = 15000
+Nx = user.Nx
+Ny = user.Ny
+tfin = user.tfin
+Rho = user.Rho
+Tau = user.Tau
 
-x = LatticeBoltzmann(Nx, Ny)
+x = LB(Nx, Ny, Rho, Tau)
 
 x.Init()
 ims_vel = []
@@ -29,7 +32,7 @@ np.savetxt('ux.dat', x.u[0])
 np.savetxt('uy.dat', x.u[1])
 np.savetxt('rho.dat', x.rho)
 plot_3d(np.sqrt(x.u[0]**2+x.u[1]**2), "norm_velocity", plt.cm.viridis)
-print("viscocity in lattice units :", x.nu)
+print("viscocity in lattice units :", x.Nu)
 print("density in lattice units :", np.mean(x.rho))
 print("")
 print("Simulation_done")
