@@ -1,4 +1,5 @@
 import numpy as np
+#coment
 
 
 class LatticeBoltzmann(object):
@@ -103,9 +104,9 @@ class LatticeBoltzmann(object):
         self.rho = np.sum(self.f, axis=0)
         self.u = np.dot(self.v.transpose(), self.f.transpose((1, 0, 2)))/self.rho
         # coordinates of the cylinder
-        cx = self.Nx/4
-        cy = self.Ny/2
-        r = self.Ny/9
+        # cx = self.Nx/4
+        # cy = self.Ny/2
+        # r = self.Ny/9
         uLB = 0.04
         ly = self.Ny-1.0
         vel = np.fromfunction(lambda d, x, y: (1-d)*uLB*(1.0+1e-4*np.sin(y/ly*2*np.pi)), (2, self.Nx, self.Ny))
@@ -215,11 +216,6 @@ class LatticeBoltzmann(object):
         # Bounce Back in top and bottom boundaries to replicate the not slip
         # boundary conditions
 
-        # self.f[self.up,0,:] = self.f_post[self.low,0,:]
-        # self.f[self.low,-1,:] = self.f_post[self.up,-1,:]
-        # self.f[self.low,0,:] = self.f_post[self.up,0,:]
-        # self.f[self.up,-1,:] = self.f_post[self.low,-1,:]
-
         self.f[self.up, -1, :] = self.f_post[self.low, -1, :]
         self.f[self.low, 0, :] = self.f_post[self.up, 0, :]
 
@@ -227,42 +223,5 @@ class LatticeBoltzmann(object):
         self.f[self.r, :, 0] = self.f_post[self.r, :, -1]
         self.f[self.l, :, -1] = self.f_post[self.l, :, 0]
 
-        # self.f[6,:,0] = self.f_post[6,:,-1]
-        # # corners
-        # # r up
-        # self.f[8,-1,-1] = self.f_post[4,-1,-1]
-        # self.f[6,-1,-1] = self.f_post[3,-1,-1]
-        # self.f[2,-1,-1] = self.f_post[1,-1,-1]
-        # # l up
-        # self.f[2,-1,0] = self.f_post[1,-1,0]
-        # self.f[5,-1,0] = self.f_post[7,-1,0]
-        # self.f[3,-1,0] = self.f_post[6,-1,0]
-        # # r low
-        # self.f[7,0,-1] = self.f_post[5,0,-1]
-        # self.f[1,0,-1] = self.f_post[2,0,-1]
-        # self.f[6,0,-1] = self.f_post[3,0,-1]
-        # # l low
-        # self.f[3,0,0] = self.f_post[6,0,0]
-        # self.f[4,0,0] = self.f_post[8,0,0]
-        # self.f[1,0,0] = self.f_post[2,0,0]
-        # obstacle
-        # Definition of obstacle
-        # r = 16
-        # x_c1 = int(3*self.Nx/6); y_c1 = int(self.Nx/2)
-        # y,x = np.ogrid[-x_c1:self.Nx-x_c1, -y_c1:self.Ny-y_c1]
-        # mask = x**2 + y**2 < r**2
-        # self.f[:,mask] = self.f_post[:,mask]
 
-    def VonKarman_boundaries(self):
-        # r Wall: outflow condition
-        self.f[self.r, -1, :] = self.f[self.r, -2, :]
-        # l Wall
-        self.f[self.r, 0, :] = self.f[self.l, 0, :] + self.Feq_fluids()[self.r, 0, :] - self.f[self.l, 0, :]
-        # coordinates of the cylinder
-        cx = self.Nx/4
-        cy = self.Ny/2
-        r = self.Ny/9
-        obstacle = np.fromfunction(lambda x, y: (x-cx)**2+(y-cy)**2 < r**2, (self.Nx, self.Ny))
-        noslip = [self.v.tolist().index((-self.v[i]).tolist()) for i in range(self.Q)]
-        for i in range(self.Q):
-            self.f_post[i, obstacle] = self.f[noslip[i], obstacle]
+   
