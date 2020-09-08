@@ -14,15 +14,12 @@ if [ ! -e "${Animation_folder}" ]; then
 	echo "The folder ${Animation_folder} does not exist, it's created" 
 else
 	rm "${Animation_folder}"/*.gif
-	echo "Old elements in ${Animation_folder} are deleted"
 fi
 
 if [ ! -e "${Data_folder}" ]; then
 	mkdir "${Data_folder}"
-	echo "The folder ${Data_folder} does not exist, it's created" 
 else
 	rm "${Data_folder}"/*.dat
-	echo "Old elements in ${Data_folder} are deleted"
 fi
 
 if [ ! -e "${Plots_folder}" ]; then
@@ -30,7 +27,6 @@ if [ ! -e "${Plots_folder}" ]; then
 	echo "The folder ${Plots_folder} does not exist, it's created" 
 else
 	rm "${Plots_folder}"/*.png
-	echo "Old elements in ${Plots_folder} are deleted"
 fi
 
 

@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import numpy as np
 from mpl_toolkits.mplot3d import Axes3D
+import user
 
 
 def plot_3d(data, name, color):
@@ -22,7 +23,7 @@ def plot_3d(data, name, color):
                      linewidth=0, antialiased=False)
     ax1.set_xlabel("x")
     ax1.set_ylabel("y")
-    ax1.set_zlabel(name)
+    ax1.set_zlabel("$"+name+"$"+" $m/s$")
     ax1.set_xlim(np.min(X), np.max(X))
     ax1.set_ylim(np.min(Y), np.max(Y))
     #ax1.set_zlim(0.5,1.1)
@@ -38,7 +39,7 @@ def plot_3d(data, name, color):
     plt.tight_layout()
 
 
-def Animation(cube, name, color):
+def Animation(cube, name, color, time):
     fig = plt.figure()
     # x = np.arange(np.shape(cube)[0])
     # y = np.arange(np.shape(cube)[0])
@@ -50,7 +51,8 @@ def Animation(cube, name, color):
     for i in range(len(cube)):
         im = plt.imshow(cube[i], cmap=mappable.cmap,
                         interpolation="gaussian", animated=True)
-        ims.append([im])
+        im1 = plt.text(user.Nx, user.Ny + 5, "time = {:.3f} s".format(time[i]))
+        ims.append([im, im1])
         #plt.savefig("imagen_"+str(i))
     ani = animation.ArtistAnimation(fig, ims, interval=50, blit=True,
                                     repeat_delay=1000)

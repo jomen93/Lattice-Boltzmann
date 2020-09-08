@@ -2,26 +2,30 @@ import numpy as np
 
 
 class LatticeBoltzmann(object):
-    def __init__(self, Nx, Ny, Rho, Tau):
+    def __init__(self, Nx, Ny, Rho, tau):
         super(LatticeBoltzmann, self).__init__()
         # definitios of adimensional parameters
-        self.Lx = 1                             # m
-        self.Ly = 1                             # m
-        self.T = 1                              # s
-        self.Ux = 1                             # m/s
-        self.Uy = 1                             # m/s
-        self.Rho = Rho                          # kg/m2 air density
-        self.Tau = Tau                          # Relaxation time
-        self.Nu = 0.1                           # Kinematic Viscocity
+        self.L = 1e-3                          # m
+        self.U = 1.22625                       # m/s
+        self.CRho = Rho                        # kg/m3 air density
+        self.tau = tau                         # Relaxation time
+        self.dx = 5e-5
+        # self.Ct = 1
+        # self.Cu = self.Cx/self.Ct
+        self.tau_L = 0.6
+        self.Nu = 1e-6                         # m2/s
+        self.c2 = 1/3.
+        self.dt = (self.c2*(self.tau_L-0.5)*self.dx**2)/self.Nu
 
-        # From this point all variables are adimensional
-        self.Nx = int(Nx/self.Lx)
-        self.Ny = int(Ny/self.Ly)
-        self.dt = 1
-        self.tau = self.Tau/self.T
+        # self.tau_L = 0.6
+        # self.U_L = self.U*Ct/Cx
+        # self.Nu_L = self.c2*(self.tau_L-0.5)
+        # self.Nu = (self.c2*(self.tau_L-0.5)*self.Cx**2)/self.Ct
+
+        self.Nx = int(Nx/self.L)
+        self.Ny = int(Ny/self.L)
         self.W = self.dt/self.tau
         self.Wp = 1-self.W
-        self.c2 = 1/3.
 
         # Parameteres od lattice D2Q9
         self.D = 2
@@ -43,7 +47,7 @@ class LatticeBoltzmann(object):
         # Reynolds number
         # kinematic viscosity
         # Reynolds Number
-        self.Re = (self.Lx*self.Ux)/self.Nu
+        self.Re = (self.L*self.U)/self.Nu
         # Relaxation parameters
         self.omega = self.dt/self.tau
 
@@ -59,7 +63,7 @@ class LatticeBoltzmann(object):
 
         # initialization macroscopic variables
         self.rho = np.ones((Nx, Ny))
-        self.u = np.zeros((self.D, Nx, Ny))
+        self.u = np.zeros((self.D, Nx, Ny))/self.U
         self.F = np.zeros((self.D, Nx, Ny))
 
         # definition of distributions
@@ -130,7 +134,7 @@ class LatticeBoltzmann(object):
         return self.f_Source
 
     def Pouseuille_Force(self):
-        g = 1e-6
+        g = 1.35e-5
         self.F[1] = -g*self.rho
         cuF = 3.0*np.dot(self.v, self.F.transpose(1, 0, 2))
         usqrF = 3/2.*(self.F[0]*self.u[0]+self.F[1]*self.u[1])
@@ -162,6 +166,5 @@ class LatticeBoltzmann(object):
         self.f[self.up, 0, :] = self.f_post[self.low, 0, :]
 
         # # Periodic boundaries in l and r boundaries
-        # self.f[self.r, :, 0] = self.f_post[self.r, :, -1]
-        # self.f[self.l, :, -1] = self.f_post[self.l, :, 0]
-        #   
+        self.f[self.r, :, 0] = self.f_post[self.r, :, -1]
+        self.f[self.l, :, -1] = self.f_post[self.l, :, 0]
