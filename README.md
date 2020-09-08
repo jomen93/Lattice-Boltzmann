@@ -24,7 +24,7 @@ where
 This quantity represents a momentum transfer (reversible process) given by the mechanical transport of the fluid particles in space. The starting point to obtain the dynamics of Navier Stokes will be to consider that the viscosity is due to a moment transfer where energy is not conserved, therefore there is an irreversible process, from places where the speed is great to others where speed is small. Then in the definition of the impulse tensor a term is added that accounts for the transfer of viscous impulse. Thus
 </p>
 
-<p lang="center">
+<p aling="center">
 <img src="https://latex.codecogs.com/gif.latex?\Pi_{ik}&space;=&space;p\delta_{ik}&space;&plus;&space;\rho&space;v_{i}v_{k}&space;-&space;\sigma^{'}_{ik}=-\sigma_{ik}&plus;\rho&space;v_{i}v_{k}" title="\Pi_{ik} = p\delta_{ik} + \rho v_{i}v_{k} - \sigma^{'}_{ik}=-\sigma_{ik}+\rho v_{i}v_{k}" />
 </p>
 
