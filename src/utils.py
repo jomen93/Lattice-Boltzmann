@@ -19,13 +19,14 @@ def plot_3d(data, name, color):
 
     fig = plt.figure(figsize=(10, 4))
     ax1 = fig.add_subplot(122, projection="3d")
-    ax1.plot_surface(x, y, data, cmap=mappable.cmap, norm=mappable.norm,
-                     linewidth=0, antialiased=False)
+    surf = ax1.plot_surface(x, y, data, cmap=mappable.cmap, norm=mappable.norm,
+                            linewidth=0, antialiased=False)
     ax1.set_xlabel("x")
     ax1.set_ylabel("y")
     ax1.set_zlabel("$"+name+"$"+" $m/s$")
     ax1.set_xlim(np.min(X), np.max(X))
     ax1.set_ylim(np.min(Y), np.max(Y))
+    fig.colorbar(surf, shrink=0.5, aspect=10)
     #ax1.set_zlim(0.5,1.1)
 
     ax2 = fig.add_subplot(121)
@@ -64,5 +65,7 @@ def Animation(cube, name, color, time):
     plt.title("2D field solution")
     ani.save(name+".gif", dpi=80, writer="imagemagick")
     # plt.show()
+
+
 
 

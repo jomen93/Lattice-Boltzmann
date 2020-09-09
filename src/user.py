@@ -9,12 +9,19 @@ Ny = 64
 # Evolution time
 # ============================================================================
 tfin = 50000
-
-
 # ============================================================================
 # Parameters o f the fluid
 # ============================================================================
 # Density
-Rho = 10e3
+Rho = 1e3              # kg/m3
 # Relaxation time
-tau = 0.6
+tau = 0.6               # s     it's formalism , but for convenience must be
+                        #       dimensionless
+# Diameter of pipeline
+d = 1e-3                # m
+# viscocity
+nu = 1e-6              # m2 /s
+# gravity
+g = 9.81                # m/s2
+# presion gradient
+dpdy = 0.1
