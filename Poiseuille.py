@@ -1,8 +1,8 @@
-from LB import LatticeBoltzmann as LB
+from src.LB import LatticeBoltzmann as LB
 import numpy as np
-from utils import Animation, plot_3d
+from src.utils import Animation, plot_3d
 import matplotlib.pyplot as plt
-import user
+import src.user as user
 
 Nx = user.Nx
 Ny = user.Ny

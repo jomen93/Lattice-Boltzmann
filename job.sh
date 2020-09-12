@@ -31,7 +31,7 @@ fi
 
 
 #compilation of principal program
-python src/main.py
+python Poiseuille.py
 
 # organization of utput files
 mv *.gif "${Animation_folder}"

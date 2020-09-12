@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import numpy as np
 from mpl_toolkits.mplot3d import Axes3D
-import user
+import src.user as user
 
 
 def plot_3d(data, name, color):
