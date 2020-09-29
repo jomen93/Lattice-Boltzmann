@@ -1,8 +1,4 @@
-
 clear
-
-
-
 # define directories
 Animation_folder=Animations
 Data_folder=DATA
