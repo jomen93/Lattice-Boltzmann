@@ -16,7 +16,7 @@ private:
 	double uy[Lx][Ly];
 	double tau;
 	double dt;
-
+	
 public:
 		LatticeBoltzmann(void);
 

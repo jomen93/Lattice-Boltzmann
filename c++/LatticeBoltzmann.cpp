@@ -1,15 +1,18 @@
 // my_class.cpp
-#include "my_class.h" 
+#include "LatticeBoltzmann.h" 
 #include <iostream> 
 #include <fstream>
 #include <cstring>
+#include<time.h>
 
 using namespace std;
 
 const double rhoo = 1.0;
 const double Uxo = 0.06;
 const double Uyo = 0.0;
-const double tau = 0.53;
+ofstream globalfile;
+char datafile[11] = "global.dat";
+time_t ltime;
 
 LatticeBoltzmann::LatticeBoltzmann(void)
 {
@@ -32,6 +35,9 @@ LatticeBoltzmann::LatticeBoltzmann(void)
      // Parameters
      tau = 0.53;
      dt = 1.0;
+
+     // Name outputfile
+
 }
 
 void LatticeBoltzmann::begin(void)
@@ -109,48 +115,64 @@ void LatticeBoltzmann::Macroscopic(void)
 
 void LatticeBoltzmann::State()
 {
-     FILE *fp_x;
-     FILE *fp_y;
-     FILE *fp_ux;
-     FILE *fp_uy;
-     FILE *fp_rho;
+     // FILE *fp_x;
+     // FILE *fp_y;
+     // FILE *fp_ux;
+     // FILE *fp_uy;
+     // FILE *fp_rho;
 
-     fp_x = fopen("x.dat","w+");
-     fp_y = fopen("y.dat","w+");
-     fp_ux = fopen("ux.dat","w+");
-     fp_uy = fopen("uy.dat","w+");
-     fp_rho = fopen("rho.dat","w+");
+     // fp_x = fopen("x.dat","w+");
+     // fp_y = fopen("y.dat","w+");
+     // fp_ux = fopen("ux.dat","w+");
+     // fp_uy = fopen("uy.dat","w+");
+     // fp_rho = fopen("rho.dat","w+");
 
-     for (int ix = 0; ix <= Lx; ++ix) fprintf(fp_x, "%e \n", float(ix)/Lx);
+     // for (int ix = 0; ix <= Lx; ++ix) fprintf(fp_x, "%e \n", float(ix)/Lx);
      
-     for (int iy = 0; iy <= Ly; ++iy) fprintf(fp_y, "%e \n", float(iy)/Ly);
+     // for (int iy = 0; iy <= Ly; ++iy) fprintf(fp_y, "%e \n", float(iy)/Ly);
      
-     for (int ix = 0; ix <= Lx; ++ix)  
-          {
-               for (int iy = 0; iy <= Ly; ++iy)
-               fprintf(fp_ux, "%e \n", ux[ix][iy]);
-               fprintf(fp_ux, "\n");
-          }
+     // for (int ix = 0; ix <= Lx; ++ix)  
+     //      {
+     //           for (int iy = 0; iy <= Ly; ++iy)
+     //           fprintf(fp_ux, "%e \n", ux[ix][iy]);
+     //           fprintf(fp_ux, "\n");
+     //      }
 
-     for (int ix = 0; ix <= Lx; ++ix)  
-          {
-               for (int iy = 0; iy <= Ly; ++iy)
-               fprintf(fp_uy, "%e \n", uy[ix][iy]);
-               fprintf(fp_uy, "\n");
-          }
+     // for (int ix = 0; ix <= Lx; ++ix)  
+     //      {
+     //           for (int iy = 0; iy <= Ly; ++iy)
+     //           fprintf(fp_uy, "%e \n", uy[ix][iy]);
+     //           fprintf(fp_uy, "\n");
+     //      }
      
-     for (int ix = 0; ix <= Lx; ++ix)  
-          {
-               for (int iy = 0; iy <= Ly; ++iy)
-               fprintf(fp_rho, "%e \n", rho[ix][iy]);
-               fprintf(fp_rho, "\n");
-          }
+     // for (int ix = 0; ix <= Lx; ++ix)  
+     //      {
+     //           for (int iy = 0; iy <= Ly; ++iy)
+     //           fprintf(fp_rho, "%e \n", rho[ix][iy]);
+     //           fprintf(fp_rho, "\n");
+     //      }
      
-     fclose(fp_x);
-     fclose(fp_y);
-     fclose(fp_ux);
-     fclose(fp_uy);
-     fclose(fp_rho);
+     // fclose(fp_x);
+     // fclose(fp_y);
+     // fclose(fp_ux);
+     // fclose(fp_uy);
+     // fclose(fp_rho);
+     globalfile.open(datafile);
+     if (!globalfile.is_open())
+     {
+          cerr << "Error opening file " << endl;
+          exit(EXIT_FAILURE);
+     }
+     printf("Opened global log file ----> %s\n", datafile);
+     ltime = time(NULL);
+     globalfile << "# D2Q9 grid system " << endl;
+     globalfile << "# " << asctime(localtime(&ltime));
+     globalfile << "# Grid size = " << Lx << " x " << Ly << endl;
+     globalfile << "# Relaxation time tau = " << tau <<  endl;
+     globalfile << "# Initial velocity ux = " << Uxo << endl;
+     globalfile << "# Initial velocity uy = " << Uyo << endl;
+     globalfile << "# Intial density rho_o = " << rhoo << endl;
+     globalfile.close();
 }
 
 

@@ -3,15 +3,19 @@
 #include <cmath>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 using namespace std;
 
-#include "my_class.h"
+#include "LatticeBoltzmann.h"
 
 
 int main (int argc, char *argv[])
 {
 	LatticeBoltzmann LB;
-	int tmax = 1;
+	time_t start, end; 
+	int tmax = 10;
+	time(&start);
+	double elapsed;
 	LB.begin();
 	for (int t = 0; t < tmax; ++t)
 	{
@@ -20,5 +24,10 @@ int main (int argc, char *argv[])
 		LB.Macroscopic();
 	}
 	LB.State();
+	time(&end);
+	elapsed = end - start;
+	printf("\n **** All runs completed **** \n");
+	printf("**** elapesed time = %f s ****", elapsed);
+	printf(" Using \n");
 	return 0; 
 }
