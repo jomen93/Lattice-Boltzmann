@@ -7,15 +7,17 @@
 
 using namespace std;
 
-const double rhoo = 1.0;
-const double Uxo = 0.06;
-const double Uyo = 0.0;
 ofstream globalfile;
+ofstream history;
 char datafile[11] = "global.dat";
+char data_history[13] = "history.dat";
 time_t ltime;
 
+// Lattice Boltzmann Class implementation
+// Basic constructor
 LatticeBoltzmann::LatticeBoltzmann(void)
 {
+     // Set model parameters
      // weights
      w[0]=4.0/9.0;
      w[1] = w[2] = w[3] = w[4] = 1.0/9.0;
@@ -35,9 +37,9 @@ LatticeBoltzmann::LatticeBoltzmann(void)
      // Parameters
      tau = 0.53;
      dt = 1.0;
-
-     // Name outputfile
-
+     rhoo = 1.0;
+     Uxo = 1.0;
+     Uyo = 1.0;
 }
 
 void LatticeBoltzmann::begin(void)
@@ -113,50 +115,8 @@ void LatticeBoltzmann::Macroscopic(void)
 }
 
 
-void LatticeBoltzmann::State()
+void LatticeBoltzmann::print_config()
 {
-     // FILE *fp_x;
-     // FILE *fp_y;
-     // FILE *fp_ux;
-     // FILE *fp_uy;
-     // FILE *fp_rho;
-
-     // fp_x = fopen("x.dat","w+");
-     // fp_y = fopen("y.dat","w+");
-     // fp_ux = fopen("ux.dat","w+");
-     // fp_uy = fopen("uy.dat","w+");
-     // fp_rho = fopen("rho.dat","w+");
-
-     // for (int ix = 0; ix <= Lx; ++ix) fprintf(fp_x, "%e \n", float(ix)/Lx);
-     
-     // for (int iy = 0; iy <= Ly; ++iy) fprintf(fp_y, "%e \n", float(iy)/Ly);
-     
-     // for (int ix = 0; ix <= Lx; ++ix)  
-     //      {
-     //           for (int iy = 0; iy <= Ly; ++iy)
-     //           fprintf(fp_ux, "%e \n", ux[ix][iy]);
-     //           fprintf(fp_ux, "\n");
-     //      }
-
-     // for (int ix = 0; ix <= Lx; ++ix)  
-     //      {
-     //           for (int iy = 0; iy <= Ly; ++iy)
-     //           fprintf(fp_uy, "%e \n", uy[ix][iy]);
-     //           fprintf(fp_uy, "\n");
-     //      }
-     
-     // for (int ix = 0; ix <= Lx; ++ix)  
-     //      {
-     //           for (int iy = 0; iy <= Ly; ++iy)
-     //           fprintf(fp_rho, "%e \n", rho[ix][iy]);
-     //           fprintf(fp_rho, "\n");
-     //      }
-     
-     // fclose(fp_x);
-     // fclose(fp_y);
-     // fclose(fp_ux);
-     // fclose(fp_uy);
-     // fclose(fp_rho);
      globalfile.open(datafile);
      if (!globalfile.is_open())
      {
@@ -165,18 +125,43 @@ void LatticeBoltzmann::State()
      }
      printf("Opened global log file ----> %s\n", datafile);
      ltime = time(NULL);
-     globalfile << "# D2Q9 grid system " << endl;
-     globalfile << "# " << asctime(localtime(&ltime));
-     globalfile << "# Grid size = " << Lx << " x " << Ly << endl;
-     globalfile << "# Relaxation time tau = " << tau <<  endl;
-     globalfile << "# Initial velocity ux = " << Uxo << endl;
-     globalfile << "# Initial velocity uy = " << Uyo << endl;
-     globalfile << "# Intial density rho_o = " << rhoo << endl;
+     globalfile << "************************************************\n";
+     globalfile << "*********** Lattice Boltzmann Model ************\n";
+     globalfile << "************************************************\n";
+     globalfile << "\n";
+     globalfile << "Autor: Johan S. Méndez\n";
+     globalfile << "Date: " << asctime(localtime(&ltime));
+     globalfile << "\n";
+     globalfile << "Grid system: D2Q9\n";
+     globalfile << "Grid size = " << Lx << " x " << Ly << endl;
+     globalfile << "Relaxation time tau = " << tau <<  endl;
+     globalfile << "Initial velocity ux = " << Uxo << endl;
+     globalfile << "Initial velocity uy = " << Uyo << endl;
+     globalfile << "Intial density rho_o = " << rhoo << endl;
      globalfile.close();
 }
 
+void LatticeBoltzmann::Report(void)
+{
+     // Report Progress
+     history.open(data_history, fstream::in | fstream::out | fstream::app);
+     if (!history.is_open())
+     {
+          cerr << "Error opening file " << endl;
+          exit(EXIT_FAILURE);
+     }
+     history << "===========================================\n";
+     history << "iteration " << it <<" complete !\n";
+     history << "elapsed time " << elapsed << endl;
+     history << "Physical time \n";
+     history << "time step \n";
 
+     history.close();
+}
 
+void LatticeBoltzmann::Output(void)
+{
+}
 
 
 

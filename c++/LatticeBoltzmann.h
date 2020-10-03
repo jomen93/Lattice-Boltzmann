@@ -1,11 +1,20 @@
-const int Lx =7;
-const int Ly =7;
-const int Q=9;
-const int D=2;
+#ifndef LATTICE_BOLTZMANN_H
+#define LATTICE_BOLTZMANN_H
 
+//  Lattice Boltzmann Class
 class LatticeBoltzmann
 {
-private:
+public:
+	//  
+	int it;
+	float elapsed;
+	// Lattice Parameters
+	static const int Lx =128;
+	static const int Ly =128;
+	static const int D=2;
+	static const int Q=9;
+	
+	// Lattice Variables 
 	double w[Q];
 	int cx[Q];
 	int cy[Q];
@@ -14,19 +23,27 @@ private:
 	double rho[Lx][Ly];
 	double ux[Lx][Ly];
 	double uy[Lx][Ly];
+
+	// physical parameters
 	double tau;
 	double dt;
-	
-public:
-		LatticeBoltzmann(void);
+	double rhoo;
+	double Uxo;
+	double Uyo;
+	// Member functions
+	LatticeBoltzmann(void);
 
-		// Public functions 
-        void begin(void);
-        void Collision(void);
-        void Advection(void);
-        void Macroscopic(void);
-        void State(void);
+	// Public functions 
+    void begin(void);
+    void Collision(void);
+    void Advection(void);
+    void Macroscopic(void);
+    void print_config(void);
+    void Report(void);
+    void Output(void);
 
-        // Statistical distributions
-        double feq(int i, double rhoo, double uxo, double uyo);
+    // Statistical distributions
+    double feq(int i, double rhoo, double uxo, double uyo);
 };
+
+#endif // LATTICE_BOLTZMANN_H

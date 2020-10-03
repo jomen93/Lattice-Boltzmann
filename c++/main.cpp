@@ -11,23 +11,26 @@ using namespace std;
 
 int main (int argc, char *argv[])
 {
-	LatticeBoltzmann LB;
-	time_t start, end; 
+	time_t start, end;
 	int tmax = 10;
-	time(&start);
-	double elapsed;
+
+	LatticeBoltzmann LB;
+	LB.print_config();
 	LB.begin();
 	for (int t = 0; t < tmax; ++t)
 	{
+	    start = time(NULL); 
+		LB.it = t;
+		// Perform the colision step
 		LB.Collision();
+		// Perform the advection in the grid
 		LB.Advection();
+		// Calculate of Macroscopic Physical quantities 
 		LB.Macroscopic();
+		// Print in Log file the parameters of simulation 
+		end = time(NULL);
+		LB.elapsed = double(end-start);
+		LB.Report();
 	}
-	LB.State();
-	time(&end);
-	elapsed = end - start;
-	printf("\n **** All runs completed **** \n");
-	printf("**** elapesed time = %f s ****", elapsed);
-	printf(" Using \n");
 	return 0; 
 }

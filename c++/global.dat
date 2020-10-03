@@ -1,7 +1,13 @@
-# D2Q9 grid system 
-# Tue Sep 29 20:49:16 2020
-# Grid size = 7 x 7
-# Relaxation time tau = 0.53
-# Initial velocity ux = 0.06
-# Initial velocity uy = 0
-# Intial density rho_o = 1
+************************************************
+*********** Lattice Boltzmann Model ************
+************************************************
+
+Autor: Johan S. Méndez
+Date: Sat Oct  3 14:23:38 2020
+
+Grid system: D2Q9
+Grid size = 128 x 128
+Relaxation time tau = 0.53
+Initial velocity ux = 1
+Initial velocity uy = 1
+Intial density rho_o = 1
