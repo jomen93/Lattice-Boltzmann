@@ -1,6 +1,16 @@
 import numpy as np 
+import matplotlib.pyplot as plt
 
-x = np.loadtxt("x.dat", unpack=True)
 ux = np.loadtxt("ux.dat", unpack=True)
+uy = np.loadtxt("uy.dat", unpack=True)
+rho = np.loadtxt("rho.dat", unpack=True)
 
-print(np.shape(ux))
+plt.imshow(ux)
+plt.colorbar()
+plt.show()
+plt.imshow(uy)
+plt.colorbar()
+plt.show()
+plt.imshow(rho)
+plt.colorbar()
+plt.show()

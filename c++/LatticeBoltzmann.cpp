@@ -7,10 +7,6 @@
 
 using namespace std;
 
-ofstream globalfile;
-ofstream history;
-char datafile[11] = "global.dat";
-char data_history[13] = "history.dat";
 time_t ltime;
 
 // Lattice Boltzmann Class implementation
@@ -38,8 +34,8 @@ LatticeBoltzmann::LatticeBoltzmann(void)
      tau = 0.53;
      dt = 1.0;
      rhoo = 1.0;
-     Uxo = 1.0;
-     Uyo = 1.0;
+     Uxo = 0.0;
+     Uyo = 0.0;
 }
 
 void LatticeBoltzmann::begin(void)
@@ -117,6 +113,8 @@ void LatticeBoltzmann::Macroscopic(void)
 
 void LatticeBoltzmann::print_config()
 {
+     ofstream globalfile;
+     char datafile[11] = "global.dat";
      globalfile.open(datafile);
      if (!globalfile.is_open())
      {
@@ -143,6 +141,8 @@ void LatticeBoltzmann::print_config()
 
 void LatticeBoltzmann::Report(void)
 {
+     ofstream history;
+     char data_history[13] = "history.dat";
      // Report Progress
      history.open(data_history, fstream::in | fstream::out | fstream::app);
      if (!history.is_open())
@@ -161,6 +161,44 @@ void LatticeBoltzmann::Report(void)
 
 void LatticeBoltzmann::Output(void)
 {
+     ofstream Ux;
+     ofstream Uy;
+     ofstream Rho;
+     ofstream X;
+     ofstream Y;
+     char name_Rho[8] = "rho.dat";
+     char name_Ux[7] = "ux.dat";
+     char name_Uy[7] = "uy.dat";
+     // char name_X[6] = "X.dat";
+     // char name_Y[6] = "Y.dat";
+     // // Report Progress
+     Ux.open(name_Ux, fstream::in | fstream::out | fstream::app);
+     Uy.open(name_Uy, fstream::in | fstream::out | fstream::app);
+     Rho.open(name_Rho, fstream::in | fstream::out | fstream::app);
+     if (!Ux.is_open() && !Uy.is_open() && !Rho.is_open())
+     {
+          cerr << "Error opening some file " << endl;
+          exit(EXIT_FAILURE);
+     }
+     for (int j = 0; j < Ly; ++j){
+          for (int i = 0; i < Lx; ++i){
+               Ux << " " << uy[j][i] << " ";
+               Uy << " " << uy[j][i] << " ";
+               Rho << " " << rho[j][i] << " ";
+               // // X << " " << uy[j][i] << " ";
+               // Y << " " << uy[j][i] << " ";
+          }
+          Ux << endl;
+          Uy << endl;
+          Rho << endl;
+     }
+     Ux << endl;
+     Uy << endl;
+     Rho << endl;
+
+     Ux.close();
+     Uy.close();
+     Rho.close();
 }
 
 

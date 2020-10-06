@@ -9,8 +9,8 @@ public:
 	int it;
 	float elapsed;
 	// Lattice Parameters
-	static const int Lx =128;
-	static const int Ly =128;
+	static const int Lx =64;
+	static const int Ly =64;
 	static const int D=2;
 	static const int Q=9;
 	

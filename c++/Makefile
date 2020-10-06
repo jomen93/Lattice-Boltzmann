@@ -26,6 +26,6 @@ LatticeBoltzmann.o: LatticeBoltzmann.cpp LatticeBoltzmann.h
 	$(COMPILE) $(CFLAGS) -c LatticeBoltzmann.cpp
 
 clean :
-	rm -f *.o 
-	rm -f $(PROGRAM)
-	rm -f *.dat
+	rm -f DATA/*.o 
+	rm -f DATA/$(PROGRAM)
+	rm -f DATA/*.dat

@@ -3,11 +3,11 @@
 ************************************************
 
 Autor: Johan S. Méndez
-Date: Sat Oct  3 14:23:38 2020
+Date: Tue Oct  6 16:21:11 2020
 
 Grid system: D2Q9
-Grid size = 128 x 128
+Grid size = 64 x 64
 Relaxation time tau = 0.53
-Initial velocity ux = 1
-Initial velocity uy = 1
+Initial velocity ux = 0
+Initial velocity uy = 0
 Intial density rho_o = 1

@@ -12,7 +12,7 @@ using namespace std;
 int main (int argc, char *argv[])
 {
 	time_t start, end;
-	int tmax = 10;
+	int tmax = 2;
 
 	LatticeBoltzmann LB;
 	LB.print_config();
@@ -32,5 +32,6 @@ int main (int argc, char *argv[])
 		LB.elapsed = double(end-start);
 		LB.Report();
 	}
+	LB.Output();
 	return 0; 
 }
